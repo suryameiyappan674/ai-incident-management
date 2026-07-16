@@ -1,11 +1,12 @@
 require('dotenv').config();
-var createError = require('http-errors');
-var express = require('express');
 var path = require('path');
 var http = require('http');
-var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var express = require('express');
 const mongoose = require('mongoose');
+var createError = require('http-errors');
+var usersRouter = require('./routes/users');
+var cookieParser = require('cookie-parser');
 
 // Connect to MongoDB
 const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ai_incident_management';
@@ -14,9 +15,6 @@ mongoose.connect(mongoURI)
     console.log('Connected to MongoDB successfully at:', mongoURI);
   })
   .catch((err) => console.error('MongoDB connection error:', err));
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
 var app = express();
 const server = http.createServer(app);
@@ -31,7 +29,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const Role = require('../models/Role');
 const { authenticateJWT, authorizeRoles, authorizePermissions } = require('../middleware/auth');
 
 // Generate JWT Helper
@@ -19,17 +18,17 @@ const generateToken = (user) => {
 /* POST login user. */
 router.post('/login', async (req, res, next) => {
   try {
-    const { loginIdentifier, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!loginIdentifier || !password) {
+    if (!email || !password) {
       return res.status(400).json({ message: 'Username/Email and password are required' });
     }
 
     // Find user, select password, and populate role
     const user = await User.findOne({
       $or: [
-        { email: loginIdentifier.toLowerCase() },
-        { username: loginIdentifier }
+        { email: email.toLowerCase() },
+        { username: email }
       ]
     }).select('+password').populate('role');
 
