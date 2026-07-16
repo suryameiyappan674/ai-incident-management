@@ -16,58 +16,6 @@ const generateToken = (user) => {
   );
 };
 
-/* POST register user. */
-router.post('/register', async (req, res, next) => {
-  try {
-    const { username, email, password, role } = req.body;
-
-    // Check if user already exists
-    const userExists = await User.findOne({ $or: [{ email }, { username }] });
-    if (userExists) {
-      return res.status(400).json({ message: 'Username or Email is already registered' });
-    }
-
-    // Resolve role name to its ObjectId
-    const roleName = (role || 'user').toLowerCase();
-    const roleDoc = await Role.findOne({ name: roleName });
-    if (!roleDoc) {
-      return res.status(400).json({ message: `Role '${roleName}' does not exist` });
-    }
-
-    // Create user
-    const user = new User({
-      username,
-      email,
-      password,
-      role: roleDoc._id
-    });
-
-    await user.save();
-    await user.populate('role');
-
-    // Do not return password in response
-    const userResponse = {
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      role: {
-        _id: user.role._id,
-        name: user.role.name,
-        permissions: user.role.permissions
-      },
-      createdAt: user.createdAt
-    };
-
-    res.status(201).json({
-      message: 'User registered successfully',
-      user: userResponse,
-      token: generateToken(user)
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
 /* POST login user. */
 router.post('/login', async (req, res, next) => {
   try {
@@ -143,10 +91,10 @@ router.get('/admin-only', authenticateJWT, authorizeRoles('admin'), (req, res) =
   });
 });
 
-/* GET manager-only protected resource. */
-router.get('/manager-only', authenticateJWT, authorizeRoles('admin', 'manager'), (req, res) => {
+/* GET engineer-only protected resource. */
+router.get('/engineer-only', authenticateJWT, authorizeRoles('admin', 'engineer'), (req, res) => {
   res.json({
-    message: 'Welcome Manager/Admin! This resource is restricted to Managers and Admins.',
+    message: 'Welcome Engineer/Admin! This resource is restricted to Engineers and Admins.',
     user: {
       _id: req.user._id,
       username: req.user.username,
