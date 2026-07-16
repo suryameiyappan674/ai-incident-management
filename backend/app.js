@@ -6,9 +6,12 @@ var express = require('express');
 const mongoose = require('mongoose');
 var createError = require('http-errors');
 var usersRouter = require('./routes/users');
+var incidentsRouter = require('./routes/incidents');
 // Import models to ensure schemas are registered with Mongoose
 require('./models/Role');
 require('./models/User');
+require('./models/Incident');
+require('./models/IncidentAssignment');
 var cookieParser = require('cookie-parser');
 
 // Connect to MongoDB
@@ -33,6 +36,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api/v1/users', usersRouter);
+app.use('/api/v1/incidents', incidentsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
