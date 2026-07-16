@@ -2,7 +2,7 @@ module.exports = {
   apps: [
     {
       name: "backend-node",
-      script: "server.js",
+      script: "app.js",
       instances: "max",
       exec_mode: "cluster",
       watch: false,
