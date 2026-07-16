@@ -43,7 +43,8 @@ router.post('/login', async (req, res, next) => {
 
     res.json({
       message: 'Logged in successfully',
-      user: {
+      statusCode: 200,
+      data: {
         _id: user._id,
         username: user.username,
         email: user.email,
@@ -51,9 +52,9 @@ router.post('/login', async (req, res, next) => {
           _id: user.role._id,
           name: user.role.name,
           permissions: user.role.permissions
-        }
-      },
-      token: generateToken(user)
+        },
+        token: generateToken(user)
+      }
     });
   } catch (error) {
     next(error);

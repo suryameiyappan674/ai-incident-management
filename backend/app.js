@@ -6,6 +6,9 @@ var express = require('express');
 const mongoose = require('mongoose');
 var createError = require('http-errors');
 var usersRouter = require('./routes/users');
+// Import models to ensure schemas are registered with Mongoose
+require('./models/Role');
+require('./models/User');
 var cookieParser = require('cookie-parser');
 
 // Connect to MongoDB
@@ -29,7 +32,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/users', usersRouter);
+app.use('/api/v1/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -42,17 +45,16 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  if (req.path.startsWith('/users') || req.headers.accept?.includes('application/json')) {
-    return res.status(err.status || 500).json({
-      message: err.message,
-      error: req.app.get('env') === 'development' ? err.stack : {}
+  if (err.status === 404) {
+    return res.status(404).json({
+      message: "Not Found",
+      statusCode: 404
     });
   }
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+  return res.status(err.status || 500).json({
+    message: err.message,
+    error: req.app.get('env') === 'development' ? err.stack : {}
+  });
 });
 
 const startServer = () => {
