@@ -3,6 +3,7 @@ var path = require('path');
 var http = require('http');
 var logger = require('morgan');
 var express = require('express');
+var cors = require('cors');
 const mongoose = require('mongoose');
 var createError = require('http-errors');
 var usersRouter = require('./routes/users');
@@ -29,6 +30,12 @@ const server = http.createServer(app);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+app.use(cors({
+  origin: 'http://localhost:4200',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
