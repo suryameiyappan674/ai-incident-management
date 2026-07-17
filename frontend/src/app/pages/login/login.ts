@@ -1,5 +1,11 @@
+<<<<<<< HEAD
 import { Component, inject } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+=======
+import { Component, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+>>>>>>> ebd3cf5 (bugs)
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -33,41 +39,93 @@ export class Login {
   private router = inject(Router);
 
   hidePassword = true;
-  isLoading = false;
-  errorMessage = '';
+  loginForm;
+  private isBrowser: boolean;
 
-  loginForm = this.fb.group({
-    // Accepts email OR username — no strict email validator
-    email: ['', [Validators.required]],
-    password: ['', [Validators.required]]
-  });
+  constructor(
+    private fb: FormBuilder,
+    private authService: Auth,
+    private router: Router,
+    platformId: object = inject(PLATFORM_ID)
+  ) {
+    this.isBrowser = isPlatformBrowser(platformId);
 
-  login() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
+    if (this.isBrowser) {
+      localStorage.clear();
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    loginForm = this.fb.group({
+      // Accepts email OR username — no strict email validator
+      email: ['', [Validators.required]],
+      password: ['', [Validators.required]]
+    });
 
-    this.auth.login(this.loginForm.getRawValue() as { email: string; password: string })
-      .subscribe({
-        next: (response: any) => {
-          this.isLoading = false;
+    login() {
+      if (this.loginForm.invalid) {
+        this.loginForm.markAllAsTouched();
+        return;
+      }
 
-          if (response?.statusCode === 200 && response?.data?.token) {
-            this.auth.saveSession(response.data);
-            this.router.navigate(['/dashboard']);
-          } else {
-            this.errorMessage = 'Invalid credentials. Please try again.';
+      this.isLoading = true;
+      this.errorMessage = '';
+
+<<<<<<< HEAD
+      this.auth.login(this.loginForm.getRawValue() as { email: string; password: string })
+        .subscribe({
+          next: (response: any) => {
+            this.isLoading = false;
+=======
+      next: (response: any) => {
+
+        console.log(response);
+
+        if (response.statusCode === 200) {
+          if (this.isBrowser) {
+            localStorage.setItem('token', response.data.token);
+            localStorage.setItem('role', JSON.stringify(response.data.role));
+            // Store engineer username
+            localStorage.setItem('username', response.data.username);
           }
-        },
-        error: (err) => {
-          this.isLoading = false;
-          this.errorMessage =
-            err?.error?.message ?? 'Invalid email or password.';
-        }
-      });
+          const role = response.data.role.name
+          // Role based navigation
+
+          if (role === 'engineer') {
+
+            this.router.navigate([
+              '/engineer'
+            ]);
+>>>>>>> ebd3cf5 (bugs)
+
+            if (response?.statusCode === 200 && response?.data?.token) {
+              this.auth.saveSession(response.data);
+              this.router.navigate(['/dashboard']);
+            } else {
+              this.errorMessage = 'Invalid credentials. Please try again.';
+            }
+<<<<<<< HEAD
+          },
+          error: (err) => {
+            this.isLoading = false;
+            this.errorMessage =
+              err?.error?.message ?? 'Invalid email or password.';
+=======
+          else if (role === 'admin') {
+
+            this.router.navigate([
+              '/dashboard'
+            ]);
+
+          }
+          else if (role === 'user') {
+            this.router.navigate([
+              '/user'
+            ]);
+          }
+        } else {
+
+          alert('Invalid email or password');
+>>>>>>> ebd3cf5 (bugs)
+          }
+        });
+    }
   }
-}
