@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
+import { isPlatformBrowser } from '@angular/common';
+import { inject, PLATFORM_ID } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,7 +18,7 @@ interface Incident {
 @Component({
   selector: 'app-engineer',
   imports: [
-     CommonModule,
+    CommonModule,
     MatTableModule,
     MatIconModule,
     MatButtonModule,
@@ -28,8 +29,8 @@ interface Incident {
   styleUrl: './engineer.css',
 })
 export class Engineer {
-
-  engineerName = localStorage.getItem('username');
+  platformId = inject(PLATFORM_ID);
+  engineerName: any;
 
   displayedColumns = [
     'incidentId',
@@ -46,7 +47,11 @@ export class Engineer {
 
   constructor(
     private router: Router
-  ) {}
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.engineerName = localStorage.getItem('username');
+    }
+  }
 
 
   ngOnInit() {

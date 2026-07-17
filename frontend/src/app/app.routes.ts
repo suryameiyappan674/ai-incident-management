@@ -1,14 +1,15 @@
 import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { Engineer } from './pages/engineer/engineer';
 import { authGuard } from './guards/auth-guard';
-
+import { User } from './pages/user/user';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'login',
-    pathMatch: 'full'
+    component: Login
   },
+
   {
     path: 'login',
     component: Login
@@ -16,10 +17,32 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    data: {
+      roles: ['admin']
+    }
+
+
+  },
+  {
+    path: 'engineer',
+    component: Engineer,
+    canActivate: [authGuard],
+    data: {
+      roles: ['engineer']
+    }
+  },
+  {
+    path: 'user',
+    component: User,
+    canActivate: [authGuard],
+    data: {
+      roles: ['user']
+    }
   },
   {
     path: '**',
-    redirectTo: 'login'
+    redirectTo: 'dashboard'
   }
+
 ];
