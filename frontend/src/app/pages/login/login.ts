@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-import { Component, inject } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-=======
 import { Component, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
->>>>>>> ebd3cf5 (bugs)
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -69,12 +64,6 @@ export class Login {
       this.isLoading = true;
       this.errorMessage = '';
 
-<<<<<<< HEAD
-      this.auth.login(this.loginForm.getRawValue() as { email: string; password: string })
-        .subscribe({
-          next: (response: any) => {
-            this.isLoading = false;
-=======
       next: (response: any) => {
 
         console.log(response);
@@ -94,7 +83,6 @@ export class Login {
             this.router.navigate([
               '/engineer'
             ]);
->>>>>>> ebd3cf5 (bugs)
 
             if (response?.statusCode === 200 && response?.data?.token) {
               this.auth.saveSession(response.data);
@@ -102,30 +90,22 @@ export class Login {
             } else {
               this.errorMessage = 'Invalid credentials. Please try again.';
             }
-<<<<<<< HEAD
-          },
-          error: (err) => {
-            this.isLoading = false;
-            this.errorMessage =
-              err?.error?.message ?? 'Invalid email or password.';
-=======
           else if (role === 'admin') {
 
-            this.router.navigate([
-              '/dashboard'
-            ]);
+              this.router.navigate([
+                '/dashboard'
+              ]);
 
-          }
-          else if (role === 'user') {
-            this.router.navigate([
-              '/user'
-            ]);
-          }
-        } else {
+            }
+            else if (role === 'user') {
+              this.router.navigate([
+                '/user'
+              ]);
+            }
+          } else {
 
-          alert('Invalid email or password');
->>>>>>> ebd3cf5 (bugs)
+            alert('Invalid email or password');
           }
         });
+      }
     }
-  }
