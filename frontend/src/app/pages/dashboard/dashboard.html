@@ -4,18 +4,12 @@
     <h2>Incident Intelligence Dashboard</h2>
 
     <div class="actions">
-      <button
-        mat-raised-button
-        color="primary"
-        (click)="openCreateIncident()">
+      <button mat-raised-button color="primary" (click)="openCreateIncident()">
         <mat-icon>add</mat-icon>
         Create Incident
       </button>
 
-      <button
-        mat-button
-        color="warn"
-        (click)="logout()">
+      <button mat-button color="warn" (click)="logout()">
         <mat-icon>logout</mat-icon>
         Logout
       </button>
@@ -47,9 +41,9 @@
 
   <!-- Loading Indicator -->
   @if (isLoading) {
-    <div class="spinner-container">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+  <div class="spinner-container">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
   }
 
   <!-- Data Table -->
@@ -71,7 +65,8 @@
           <div class="title-cell">
             <span class="title-text">{{row.title}}</span>
             @if (row.description) {
-              <small class="description-preview">{{row.description | slice:0:60}}{{row.description.length > 60 ? '...' : ''}}</small>
+            <small class="description-preview">{{row.description | slice:0:60}}{{row.description.length > 60 ? '...' :
+              ''}}</small>
             }
           </div>
         </td>
@@ -126,13 +121,8 @@
     </table>
 
     <!-- Pagination -->
-    <mat-paginator
-      [length]="totalRecords"
-      [pageSize]="pageSize"
-      [pageSizeOptions]="[5, 10, 20]"
-      [pageIndex]="currentPage"
-      (page)="onPageChange($event)"
-      aria-label="Select page of incidents">
+    <mat-paginator [length]="totalRecords" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+      [pageIndex]="currentPage" (page)="onPageChange($event)" aria-label="Select page of incidents">
     </mat-paginator>
 
   </mat-card>

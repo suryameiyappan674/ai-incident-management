@@ -3,6 +3,7 @@ var path = require('path');
 var http = require('http');
 var logger = require('morgan');
 var express = require('express');
+var cors = require('cors');
 const mongoose = require('mongoose');
 var createError = require('http-errors');
 var cors = require('cors');

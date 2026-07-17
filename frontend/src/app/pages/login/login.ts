@@ -28,17 +28,17 @@ import { Auth } from '../../services/auth';
 })
 export class Login {
 
-  private fb      = inject(FormBuilder);
-  private auth    = inject(Auth);
-  private router  = inject(Router);
+  private fb = inject(FormBuilder);
+  private auth = inject(Auth);
+  private router = inject(Router);
 
   hidePassword = true;
-  isLoading    = false;
+  isLoading = false;
   errorMessage = '';
 
   loginForm = this.fb.group({
     // Accepts email OR username — no strict email validator
-    email:    ['', [Validators.required]],
+    email: ['', [Validators.required]],
     password: ['', [Validators.required]]
   });
 
@@ -48,7 +48,7 @@ export class Login {
       return;
     }
 
-    this.isLoading    = true;
+    this.isLoading = true;
     this.errorMessage = '';
 
     this.auth.login(this.loginForm.getRawValue() as { email: string; password: string })
@@ -64,7 +64,7 @@ export class Login {
           }
         },
         error: (err) => {
-          this.isLoading    = false;
+          this.isLoading = false;
           this.errorMessage =
             err?.error?.message ?? 'Invalid email or password.';
         }

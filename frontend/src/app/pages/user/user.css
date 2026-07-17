@@ -1,0 +1,64 @@
+.user-page{
+    padding:5px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.header h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.welcome{
+    font-weight:600;
+    color:#1565c0;
+}
+
+.content{
+    padding:5px;
+}
+
+table{
+    width:100%;
+}
+/* 
+.mat-mdc-header-row{
+    background:#1976d2;
+}
+
+.mat-mdc-header-cell{
+    color:#fff;
+    font-weight:600;
+} */
+
+.status{
+    padding:5px 12px;
+    border-radius:15px;
+    color:#fff;
+    font-size:12px;
+}
+
+.Pending{
+    background:#ef6c00;
+}
+
+.InProgress{
+    background:#1976d2;
+}
+
+.Resolved{
+    background:#2e7d32;
+}

@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema({
 });
 
 // Pre-save middleware to hash password before saving
-userSchema.pre('save', async function() {
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
     return;
   }
@@ -41,8 +41,8 @@ userSchema.pre('save', async function() {
 });
 
 // Method to compare candidate password with hashed password
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);
