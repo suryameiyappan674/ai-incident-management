@@ -44,18 +44,17 @@ export class Engineer {
 
   incidents: Incident[] = [];
 
-
-  constructor(
-    private router: Router
-  ) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.engineerName = localStorage.getItem('username');
-    }
-  }
+  constructor(private router: Router) { }
 
 
   ngOnInit() {
-
+    if (isPlatformBrowser(this.platformId)) {
+      const userInfo = localStorage.getItem('user');
+      if (userInfo) {
+        const user = JSON.parse(userInfo);
+        this.engineerName = user.username;
+      }
+    }
     this.incidents = [
 
       {

@@ -7,21 +7,23 @@ import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
+import { inject, PLATFORM_ID } from '@angular/core';
 import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create-incident-dialog';
 interface IncidentData {
 
-  incidentId:string;
-  title:string;
-  priority:string;
-  status:string;
-  createdAt:string;
+  incidentId: string;
+  title: string;
+  priority: string;
+  status: string;
+  createdAt: string;
 
 }
 @Component({
   selector: 'app-user',
   imports: [
-     CommonModule,
-      MatCardModule,
+    CommonModule,
+    MatCardModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
@@ -29,11 +31,12 @@ interface IncidentData {
   ],
   templateUrl: './user.html',
   styleUrl: './user.css',
-  standalone:true,
+  standalone: true,
 })
 export class User {
-  userName = localStorage.getItem('username');
- displayedColumns = [
+  platformId = inject(PLATFORM_ID);
+  userName: any;
+  displayedColumns = [
 
     'incidentId',
     'title',
@@ -42,16 +45,22 @@ export class User {
     'createdAt'
 
   ];
-  
-    incidents: IncidentData[] = [];
-  
-  
-    constructor(
-      private router: Router,
-      private dialog: MatDialog,
-    ) {}
-  ngOnInit() {
 
+  incidents: IncidentData[] = [];
+
+
+  constructor(
+    private router: Router,
+    private dialog: MatDialog,
+  ) { }
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      const userInfo = localStorage.getItem('user');
+      if (userInfo) {
+        const user = JSON.parse(userInfo);
+        this.userName = user.username;
+      }
+    }
     this.incidents = [
 
       {
@@ -66,17 +75,17 @@ export class User {
 
   }
 
-   openCreateIncident(){
-  
-      this.dialog.open(CreateIncidentDialog,{
-      width: '400px',
-    height: '500px',
-    disableClose: true
-      });
-  
-    }
+  openCreateIncident() {
 
-   logout() {
+    this.dialog.open(CreateIncidentDialog, {
+      width: '400px',
+      height: '500px',
+      disableClose: true
+    });
+
+  }
+
+  logout() {
 
     localStorage.clear();
 
