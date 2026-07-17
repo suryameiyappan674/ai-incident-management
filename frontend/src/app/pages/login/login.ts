@@ -1,6 +1,6 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, PLATFORM_ID } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,7 +27,7 @@ import { Auth } from '../../services/auth';
   styleUrl: './login.css',
 })
 export class Login {
-
+  platformId = inject(PLATFORM_ID);
   private fb = inject(FormBuilder);
   private auth = inject(Auth);
   private router = inject(Router);
@@ -35,6 +35,20 @@ export class Login {
   hidePassword = true;
   isLoading = false;
   errorMessage = '';
+
+  constructor() {
+    // If user is already logged in, redirect to their role's page
+    if (isPlatformBrowser(this.platformId) && this.auth.isLoggedIn()) {
+      const user = this.auth.getUser();
+      const roleName = user?.role?.name;
+      const roleRoutes: Record<string, string> = {
+        admin: '/dashboard',
+        engineer: '/engineer',
+        user: '/user'
+      };
+      this.router.navigate([roleRoutes[roleName] ?? '/dashboard']);
+    }
+  }
 
   loginForm = this.fb.group({
     // Accepts email OR username — no strict email validator
@@ -58,7 +72,16 @@ export class Login {
 
           if (response?.statusCode === 200 && response?.data?.token) {
             this.auth.saveSession(response.data);
-            this.router.navigate(['/dashboard']);
+            if (this.auth.isLoggedIn()) {
+              const user = this.auth.getUser();
+              const roleName = user?.role?.name;
+              const roleRoutes: Record<string, string> = {
+                admin: '/dashboard',
+                engineer: '/engineer',
+                user: '/user'
+              };
+              this.router.navigate([roleRoutes[roleName] ?? '/dashboard']);
+            }
           } else {
             this.errorMessage = 'Invalid credentials. Please try again.';
           }
