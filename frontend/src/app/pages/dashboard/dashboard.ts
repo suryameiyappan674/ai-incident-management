@@ -1,84 +1,131 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create-incident-dialog';
-import { Router } from '@angular/router';
+import { Incident as IncidentService } from '../../services/incident';
+import { Auth as AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-     MatCardModule,
+    CommonModule,
+    MatCardModule,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule
+    MatPaginatorModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
+  private dialog = inject(MatDialog);
+  private incidentService = inject(IncidentService);
+  private authService = inject(AuthService);
+  private cdr = inject(ChangeDetectorRef);
 
-
-  constructor(
-    private dialog: MatDialog,
-     private router: Router
-  ){}
-
-
+  // Stats display
   dashboard = {
-    total: 12,
-    pending: 5,
-    inProgress: 3,
-    resolved: 4
+    total: 0,
+    pending: 0,
+    inProgress: 0,
+    resolved: 0
   };
 
-
+  // Table structure
   displayedColumns: string[] = [
     'incidentId',
     'title',
-    'status'
+    'priority',
+    'status',
+    'createdBy',
+    'createdAt'
   ];
 
+  incidents: any[] = [];
+  isLoading = false;
 
-  incidents = [
-    {
-      incidentId: 'INC-1001',
-      title: 'Database Down',
-      status: 'Pending'
-    },
-    {
-      incidentId: 'INC-1002',
-      title: 'API Timeout',
-      status: 'In Progress'
-    },
-    {
-      incidentId: 'INC-1003',
-      title: 'Login Failure',
-      status: 'Resolved'
-    }
-  ];
+  // Pagination status
+  totalRecords = 0;
+  pageSize = 10;
+  currentPage = 0; // 0-indexed for MatPaginator
 
-  openCreateIncident(){
+  ngOnInit() {
+    setTimeout(() => {
+      this.fetchData();
+    });
+  }
 
-    this.dialog.open(CreateIncidentDialog,{
-    width: '400px',
-  height: '500px',
-  disableClose: true
+  fetchData() {
+    this.isLoading = true;
+    // Map 0-indexed page to 1-indexed for backend API
+    this.incidentService.getIncidents(this.currentPage + 1, this.pageSize).subscribe({
+      next: (res: any) => {
+        this.isLoading = false;
+        if (res?.statusCode === 200 && res?.data) {
+          this.incidents = res.data.incidents || [];
+          this.totalRecords = res.data.total || 0;
+          if (res.data.stats) {
+            this.dashboard = {
+              total: res.data.stats.total || 0,
+              pending: res.data.stats.pending || 0,
+              inProgress: res.data.stats.inProgress || 0,
+              resolved: res.data.stats.resolved || 0
+            };
+          }
+        }
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Error fetching dashboard data:', err);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.currentPage = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.fetchData();
+  }
+
+  openCreateIncident() {
+    const dialogRef = this.dialog.open(CreateIncidentDialog, {
+      width: '400px',
+      height: '500px',
+      disableClose: true
     });
 
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.isLoading = true;
+        this.incidentService.createIncident(result).subscribe({
+          next: () => {
+            // Reset to page 0 and reload
+            this.currentPage = 0;
+            this.fetchData();
+          },
+          error: (err) => {
+            this.isLoading = false;
+            console.error('Error creating incident:', err);
+            alert(err?.error?.message || 'Failed to create incident');
+          }
+        });
+      }
+    });
   }
+
   logout() {
-
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-
-    this.router.navigate(['/login']);
-
-}
-
+    this.authService.logout();
+  }
 }

@@ -6,6 +6,7 @@ var express = require('express');
 var cors = require('cors');
 const mongoose = require('mongoose');
 var createError = require('http-errors');
+var cors = require('cors');
 var usersRouter = require('./routes/users');
 var incidentsRouter = require('./routes/incidents');
 // Import models to ensure schemas are registered with Mongoose
@@ -31,10 +32,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(cors({
-  origin: 'http://localhost:4200',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: [
+    'http://localhost:4200',
+    'http://localhost:4000',
+    'http://10.68.10.106:4200'
+  ],
+  credentials: true
 }));
 app.use(logger('dev'));
 app.use(express.json());

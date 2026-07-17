@@ -72,21 +72,43 @@ router.get('/', authenticateJWT, async (req, res, next) => {
     if (priority) filter.priority = priority;
     if (status) filter.status = status;
 
+    // Role-based filtering: admins see all incidents; non-admins see only assigned incidents
+    if (req.user.role && req.user.role.name !== 'admin') {
+      const assignments = await IncidentAssignment.find({ assignee: req.user._id }).select('incident');
+      const incidentIds = assignments.map(a => a.incident);
+      filter._id = { $in: incidentIds };
+    }
+
     const skip = (Number(page) - 1) * Number(limit);
 
-    const [incidents, total] = await Promise.all([
+    const [incidents, total, openCount, progressCount, resolvedCount, closedCount] = await Promise.all([
       Incident.find(filter)
         .populate('createdBy', 'username email')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(Number(limit)),
-      Incident.countDocuments(filter)
+      Incident.countDocuments(filter),
+      Incident.countDocuments({ ...filter, status: 'Open' }),
+      Incident.countDocuments({ ...filter, status: 'In Progress' }),
+      Incident.countDocuments({ ...filter, status: 'Resolved' }),
+      Incident.countDocuments({ ...filter, status: 'Closed' })
     ]);
 
     return res.json({
       message: 'Incidents fetched successfully',
       statusCode: 200,
-      data: { total, page: Number(page), limit: Number(limit), incidents }
+      data: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        incidents,
+        stats: {
+          total,
+          pending: openCount,
+          inProgress: progressCount,
+          resolved: resolvedCount + closedCount
+        }
+      }
     });
   } catch (error) {
     next(error);
