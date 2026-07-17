@@ -4,8 +4,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create-incident-dialog';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,7 +15,8 @@ import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create
      MatCardModule,
     MatTableModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css'
@@ -23,7 +25,8 @@ export class Dashboard {
 
 
   constructor(
-    private dialog: MatDialog
+    private dialog: MatDialog,
+     private router: Router
   ){}
 
 
@@ -69,5 +72,13 @@ export class Dashboard {
     });
 
   }
+  logout() {
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('role');
+
+    this.router.navigate(['/login']);
+
+}
 
 }
