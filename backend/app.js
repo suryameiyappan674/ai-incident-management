@@ -5,6 +5,7 @@ var logger = require('morgan');
 var express = require('express');
 const mongoose = require('mongoose');
 var createError = require('http-errors');
+var cors = require('cors');
 var usersRouter = require('./routes/users');
 var incidentsRouter = require('./routes/incidents');
 // Import models to ensure schemas are registered with Mongoose
@@ -29,6 +30,14 @@ const server = http.createServer(app);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+app.use(cors({
+  origin: [
+    'http://localhost:4200',
+    'http://localhost:4000',
+    'http://10.68.10.106:4200'
+  ],
+  credentials: true
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

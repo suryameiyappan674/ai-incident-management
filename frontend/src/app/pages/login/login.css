@@ -58,3 +58,14 @@ mat-form-field {
   transform: translateY(-1px);
   transition: .3s;
 }
+
+.error-msg {
+  color: #e53935;
+  font-size: 13px;
+  margin: -8px 0 10px;
+  text-align: center;
+}
+
+.login-btn mat-spinner {
+  margin: 0 auto;
+}

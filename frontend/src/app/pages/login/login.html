@@ -11,13 +11,16 @@
     <form [formGroup]="loginForm" (ngSubmit)="login()">
 
       <mat-form-field appearance="outline">
-        <mat-label>Username</mat-label>
+        <mat-label>Username / Email</mat-label>
         <input
           matInput
           formControlName="email"
-          placeholder="Enter email">
-
+          placeholder="Enter email or username"
+          autocomplete="username">
         <mat-icon matSuffix>person</mat-icon>
+        @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+          <mat-error>Username / Email is required</mat-error>
+        }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -26,7 +29,8 @@
         <input
           matInput
           [type]="hidePassword ? 'password' : 'text'"
-          formControlName="password">
+          formControlName="password"
+          autocomplete="current-password">
 
         <button
           mat-icon-button
@@ -40,14 +44,29 @@
 
         </button>
 
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <mat-error>Password is required</mat-error>
+        }
+
       </mat-form-field>
+
+      <!-- Inline API error message -->
+      @if (errorMessage) {
+        <p class="error-msg">{{ errorMessage }}</p>
+      }
 
       <button
         mat-raised-button
         color="primary"
-        class="login-btn">
+        type="submit"
+        class="login-btn"
+        [disabled]="isLoading">
 
-        Login
+        @if (isLoading) {
+          <mat-spinner diameter="22" color="accent"></mat-spinner>
+        } @else {
+          Login
+        }
 
       </button>
 

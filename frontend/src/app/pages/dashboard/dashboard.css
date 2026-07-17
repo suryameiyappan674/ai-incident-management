@@ -9,6 +9,12 @@
     margin-bottom:30px;
 }
 
+.actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
 .cards{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -41,6 +47,117 @@
     color:white;
 }
 
-table{
+.table-card {
+    position: relative;
+    padding: 0;
+}
+
+.full-width-table {
     width:100%;
+}
+
+.incident-badge {
+    font-weight: 500;
+    color: #475569;
+    font-family: monospace;
+    font-size: 13px;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.title-cell {
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+}
+
+.title-text {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.description-preview {
+    color: #64748b;
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+/* Badges for priority */
+.priority-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.priority-badge.low {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+.priority-badge.medium {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.priority-badge.high {
+    background-color: #fff7ed;
+    color: #ea580c;
+}
+
+.priority-badge.critical {
+    background-color: #fef2f2;
+    color: #dc2626;
+}
+
+/* Badges for status */
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.status-badge.open {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.status-badge.in-progress {
+    background-color: #e0f2fe;
+    color: #0284c7;
+}
+
+.status-badge.resolved {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.status-badge.closed {
+    background-color: #f3f4f6;
+    color: #4b5563;
+}
+
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.empty-table {
+    text-align: center;
+    padding: 40px !important;
+    color: #64748b;
+    font-style: italic;
 }
