@@ -63,11 +63,33 @@ export class Login {
         if (response.statusCode === 200) {
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('role', JSON.stringify(response.data.role));
+      // Store engineer username
+      localStorage.setItem(  'username',response.data.username);
+          const role =response.data.role.name
+    // Role based navigation
 
-          this.router.navigate(['/dashboard']);
-        } else {
+          if(role === 'engineer'){
 
-          alert('Invalid email or password');
+            this.router.navigate([
+              '/engineer'
+            ]);
+
+          }
+          else if(role === 'admin'){
+
+            this.router.navigate([
+              '/dashboard'
+            ]);
+
+          }
+          else if(role === 'user'){
+             this.router.navigate([
+              '/user'
+            ]);
+          }
+        }else{
+
+            alert('Invalid email or password');
         }
 
       },
