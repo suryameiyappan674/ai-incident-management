@@ -1,18 +1,25 @@
-import { CanActivateFn, Router } from '@angular/router';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { CanActivateFn, Router } from '@angular/router';
+import { Auth } from '../services/auth';
 
-export const authGuard: CanActivateFn = (route, state) => {
-
-   const router = inject(Router);
+export const authGuard: CanActivateFn = () => {
    const platformId = inject(PLATFORM_ID);
 
-   if (isPlatformBrowser(platformId)) {
-      const token = localStorage.getItem('token');
-      if (!token) {
-         router.navigate(['/login']);
-         return false;
-      }
+   // On the server (SSR), localStorage doesn't exist.
+   // Let the server-side render pass through — the browser will enforce auth.
+   if (!isPlatformBrowser(platformId)) {
+      return true;
    }
-   return true;
+
+   const auth = inject(Auth);
+   const router = inject(Router);
+
+   if (auth.isLoggedIn()) {
+      return true;
+   }
+
+   router.navigate(['/login']);
+   return false;
 };
+

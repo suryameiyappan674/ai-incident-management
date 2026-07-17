@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 
@@ -9,6 +10,7 @@ export class Auth {
 
   private http = inject(HttpClient);
   private router = inject(Router);
+  private platformId = inject(PLATFORM_ID);
 
   // private apiUrl = 'http://10.68.10.106:3000/api/v1/users/login';
 
@@ -31,7 +33,7 @@ export class Auth {
 
   /** Save token + user data returned by the API */
   saveSession(data: any) {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify({
         _id: data._id,
@@ -43,8 +45,18 @@ export class Auth {
   }
 
   /** Return the stored JWT token */
+  checkToken(): boolean {
+    if (isPlatformBrowser(this.platformId)) {
+      if (localStorage.getItem('token')) {
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
   getToken(): string | null {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (isPlatformBrowser(this.platformId)) {
       return localStorage.getItem('token');
     }
     return null;
@@ -52,12 +64,12 @@ export class Auth {
 
   /** True if a token exists in storage */
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return this.checkToken();
   }
 
   /** Clear session and navigate to login */
   logout() {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
     }
@@ -66,7 +78,7 @@ export class Auth {
 
   /** Return the stored user object */
   getUser(): any {
-    if (typeof window !== 'undefined' && window.localStorage) {
+    if (isPlatformBrowser(this.platformId)) {
       const u = localStorage.getItem('user');
       return u ? JSON.parse(u) : null;
     }
