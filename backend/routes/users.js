@@ -33,12 +33,18 @@ router.post('/login', async (req, res, next) => {
     }).select('+password').populate('role');
 
     if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      res.json({
+        message: 'Invalid credentials',
+        statusCode: 201
+      });
     }
 
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      res.json({
+        message: 'Invalid credentials',
+        statusCode: 201
+      });
     }
 
     res.json({
