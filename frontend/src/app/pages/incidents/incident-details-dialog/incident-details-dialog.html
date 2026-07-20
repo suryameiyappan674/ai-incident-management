@@ -1,0 +1,298 @@
+<!-- <h2 mat-dialog-title>Incident Details</h2>
+
+<mat-dialog-content>
+
+  <table class="details-table">
+
+    <tr>
+      <td><strong>Incident ID</strong></td>
+      <td>{{ data.incidentId }}</td>
+    </tr>
+
+    <tr>
+      <td><strong>Title</strong></td>
+      <td>{{ data.title }}</td>
+    </tr>
+
+    <tr>
+      <td><strong>Priority</strong></td>
+      <td>{{ data.priority }}</td>
+    </tr>
+   
+    <tr>
+      <td><strong>Status</strong></td>
+      <td>{{ data.status }}</td>
+    </tr>
+
+    <tr>
+      <td><strong>Created Date</strong></td>
+      <td>{{ data.createdAt }}</td>
+    </tr>
+     <tr>
+      <td><strong>Description</strong></td>
+      <td>{{ data.description }}</td>
+    </tr>
+
+
+  </table>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button
+    mat-raised-button
+    color="primary"
+    mat-dialog-close>
+    Close
+  </button>
+</mat-dialog-actions> -->
+
+
+<h2 mat-dialog-title>
+  Incident Workspace
+</h2>
+
+
+<mat-dialog-content class="dialog-body">
+
+
+<div class="incident-info">
+
+<h3>Incident Information</h3>
+
+<div class="info-grid">
+
+<div>
+<strong>Incident ID</strong>
+<p>{{data.incidentId}}</p>
+</div>
+
+
+<div>
+<strong>Title</strong>
+<p>{{data.title}}</p>
+</div>
+
+
+<div>
+<strong>Priority</strong>
+<p>{{data.priority}}</p>
+</div>
+
+
+<div>
+<strong>Status</strong>
+<p>{{data.status}}</p>
+</div>
+
+
+<div>
+<strong>Created</strong>
+<p>{{data.createdAt}}</p>
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="description-section">
+
+<h3>Description</h3>
+
+<div class="description-box">
+
+{{data.description}}
+
+</div>
+
+</div>
+
+
+
+<div class="ai-section">
+
+<h3>
+  AI Assistant Analysis
+</h3>
+
+
+<div class="ai-box">
+
+<p>
+🤖 <strong>AI Analysis:</strong>
+</p>
+
+
+<p>
+I analyzed this incident.
+The priority is {{data.priority}}.
+</p>
+
+
+<button
+  mat-raised-button
+  color="primary"
+  (click)="generateAIAnalysis()">
+
+  Generate AI Analysis
+
+</button>
+
+
+<div
+class="ai-result"
+*ngIf="aiGenerated">
+
+
+<h4>
+AI Recommendation
+</h4>
+
+
+<textarea
+  readonly
+  rows="8">
+
+{{aiContent}}
+
+</textarea>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+<div class="similar-section">
+<h3>
+  Similar Incidents
+</h3>
+<div 
+class="similar-card"
+*ngFor="let incident of similarIncidents">
+
+<h4 class="incident-title">
+ <mat-icon
+    class="copy-icon"
+    matTooltip="Copy Incident ID"
+    (click)="copyIncidentId(incident.incidentId)">
+    content_copy
+  </mat-icon> {{incident.incidentId}} - {{incident.title}}
+</h4>
+<p>
+<strong>Created At:</strong>
+{{incident.createdAt}}
+</p>
+<p>
+<strong>Status:</strong>
+{{incident.status}}
+</p>
+</div>
+
+
+
+<div 
+*ngIf="similarIncidents.length === 0"
+class="no-similar">
+
+No similar resolved incidents found.
+
+</div>
+
+
+</div>
+
+
+<div class="chat-section">
+
+<h3>
+Engineer - User Chat
+</h3>
+
+
+<div class="chat-box">
+
+
+<div class="message user">
+User: The API stopped working suddenly.
+</div>
+
+
+<div class="message engineer">
+Engineer: I am checking the logs.
+</div>
+
+<div class="message user">
+User: The API stopped working suddenly.
+</div>
+
+
+<div class="message engineer">
+Engineer: I am checking the logs.
+</div>
+<div class="message user">
+User: The API stopped working suddenly.
+</div>
+
+
+<div class="message engineer">
+Engineer: I am checking the logs.
+</div>
+</div>
+
+
+
+<div class="chat-input">
+
+<input 
+matInput
+placeholder="Type message...">
+<button
+mat-raised-button
+color="primary">
+Send
+</button>
+
+
+</div>
+
+
+</div>
+
+
+</mat-dialog-content>
+
+
+
+<mat-dialog-actions align="end">
+
+
+<button
+mat-raised-button
+color="warn"
+*ngIf="data.status==='Pending'">
+In Progress
+</button>
+
+
+<button
+mat-raised-button
+color="primary"
+*ngIf="data.status!=='Resolved'">
+Resolve
+</button>
+
+
+<button
+mat-raised-button
+color="primary"
+mat-dialog-close>
+Close
+</button>
+
+
+</mat-dialog-actions>
