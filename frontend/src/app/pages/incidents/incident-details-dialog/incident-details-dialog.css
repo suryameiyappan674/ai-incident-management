@@ -1,27 +1,4 @@
-/* .details-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.details-table td {
-  padding: 10px 8px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.details-table td:first-child {
-  width: 35%;
-  font-weight: 600;
-  color: #555;
-}
-
-mat-dialog-content {
-  min-width: 500px;
-}
-
-mat-dialog-actions {
-  padding-top: 16px;
-} */
-
+/* 
 ::ng-deep .mat-mdc-dialog-container .mat-mdc-dialog-surface {
   border-radius: 8px !important;
 }
@@ -244,4 +221,155 @@ color:#856404;
 
   color: #1976d2;
 
+} */
+
+
+::ng-deep .mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  border-radius: 8px !important;
+}
+
+.dialog-body {
+  max-height: 70vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 15px;
+}
+
+
+h3 {
+  margin-top: 10px;
+}
+
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2,1fr);
+  gap:10px;
+}
+
+
+.info-grid div {
+  background:#f5f5f5;
+  padding:10px;
+  border-radius:8px;
+}
+
+
+.description-box {
+  background:#fafafa;
+  border:1px solid #ddd;
+  padding:20px;
+  min-height:120px;
+  border-radius:8px;
+  font-size:16px;
+}
+
+
+.ai-box {
+  background:#e3f2fd;
+  padding:20px;
+  border-radius:10px;
+}
+
+
+.ai-result {
+  margin-top:20px;
+}
+
+
+.ai-result textarea {
+  width:96%;
+  min-height:200px;
+  padding:15px;
+  font-size:15px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  background:#fafafa;
+  resize:none;
+}
+
+
+.chat-box {
+  max-height:180px;
+  overflow-y:auto;
+  background:#f5f5f5;
+  padding:15px;
+  border-radius:10px;
+}
+
+
+.message {
+  padding:10px;
+  margin:8px;
+  border-radius:10px;
+  max-width:70%;
+}
+
+
+.user {
+  background:#e0e0e0;
+}
+
+
+.engineer {
+  background:#bbdefb;
+  margin-left:auto;
+}
+
+
+.chat-input {
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+
+.chat-input input {
+  flex:1;
+  padding:12px;
+  border:1px solid #ccc;
+  border-radius:8px;
+}
+
+
+.similar-section {
+  margin-top:25px;
+}
+
+
+.similar-card {
+  background:#f8f9fa;
+  border-left:5px solid #4caf50;
+  padding:15px;
+  margin-bottom:15px;
+  border-radius:8px;
+}
+
+
+.no-similar {
+  padding:20px;
+  background:#fff3cd;
+  border-radius:8px;
+  color:#856404;
+}
+
+
+.incident-title {
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+
+.copy-icon {
+  font-size:16px;
+  width:16px;
+  height:16px;
+  cursor:pointer;
+  color:#555;
+}
+
+
+.copy-icon:hover {
+  color:#1976d2;
 }

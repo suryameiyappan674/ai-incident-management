@@ -272,12 +272,14 @@ Send
 
 
 <button
-mat-raised-button
-color="warn"
-*ngIf="data.status==='Pending'">
-In Progress
-</button>
+  mat-raised-button
+  color="warn"
+  *ngIf="data.status==='Open' || data.status==='Pending'"
+  (click)="changeStatus('In Progress')">
 
+  In Progress
+
+</button>
 
 <button
 mat-raised-button

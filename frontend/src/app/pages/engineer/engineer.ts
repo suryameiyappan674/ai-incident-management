@@ -120,11 +120,11 @@ export class Engineer implements OnInit {
   openIncident(row: Incident): void {
     this.dialog.open(IncidentDetailsDialog, {
       width: '900px',
-      height: '850px',
       maxWidth: '95vw',
       maxHeight: '95vh',
       data: row,
-      disableClose: true
+      disableClose: true,
+      panelClass: 'incident-dialog'
     });
   }
 

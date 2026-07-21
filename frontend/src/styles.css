@@ -34,3 +34,18 @@ body {
 .mat-mdc-dialog-content {
     overflow: visible !important;
 }
+
+
+.incident-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+}
+
+.incident-dialog .mat-mdc-dialog-surface {
+  overflow: hidden !important;
+}
+
+.incident-dialog .mat-mdc-dialog-content {
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  padding: 20px !important;
+}
