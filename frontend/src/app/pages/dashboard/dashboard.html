@@ -138,14 +138,14 @@
     <button
       *ngIf="currentUser?.role?.name==='admin'"
       mat-raised-button
-      [ngClass]="row.assignedEngineer ? 'assigned-btn' : 'pending-btn'"
+      [ngClass]="isAssigned(row) ? 'assigned-btn' : 'pending-btn'"
       (click)="openAssignDialog(row)">
 
       <mat-icon>
-        {{ row.assignedEngineer ? 'check_circle' : 'person_add' }}
+        {{ isAssigned(row) ? 'check_circle' : 'person_add' }}
       </mat-icon>
 
-      {{ row.assignedEngineer ? 'Assigned' : 'Yet to Assign' }}
+      {{ isAssigned(row) ? 'Assigned' : 'Yet to Assign' }}
 
     </button>
 

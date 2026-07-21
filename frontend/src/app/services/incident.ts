@@ -14,6 +14,11 @@ export class Incident {
     return this.http.get<any>(`${this.apiUrl}?page=${page}&limit=${limit}`);
   }
 
+  /** Fetch assignments for the logged-in engineer */
+  getMyAssignments(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/my-assignments`);
+  }
+
   /** Create a new incident */
   createIncident(data: { title: string; description: string; priority: string }): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
