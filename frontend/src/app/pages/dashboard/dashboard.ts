@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, ChangeDetectorRef, afterNextRender } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,6 +13,8 @@ import { AssignIncidentDialog } from '../incidents/assign-incident-dialog/assign
 import { Incident as IncidentService } from '../../services/incident';
 import { Assignment as AssignmentService } from '../../services/assignment';
 import { Auth as AuthService } from '../../services/auth';
+import { PLATFORM_ID } from '@angular/core';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -35,6 +37,7 @@ export class Dashboard implements OnInit {
   private assignmentService = inject(AssignmentService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
+  private platformId = inject(PLATFORM_ID);
 
   // Stats display
   dashboard = {
@@ -65,15 +68,16 @@ export class Dashboard implements OnInit {
   totalRecords = 0;
   pageSize = 10;
   currentPage = 0; // 0-indexed for MatPaginator
- 
+
   ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.currentUser = this.authService.getUser();
 
-    this.currentUser = this.authService.getUser();
-
-    console.log(this.currentUser);
-setTimeout(() => {
-      this.fetchData();
-    });
+      console.log(this.currentUser);
+      setTimeout(() => {
+        this.fetchData();
+      });
+    }
 
   }
 
@@ -84,7 +88,7 @@ setTimeout(() => {
       next: (res: any) => {
         this.isLoading = false;
         if (res?.statusCode === 200 && res?.data) {
-        this.incidents = [...(res.data.incidents || [])];
+          this.incidents = [...(res.data.incidents || [])];
           // console.log("INCIDENTS:", this.incidents);
           this.totalRecords = res.data.total || 0;
           if (res.data.stats) {
