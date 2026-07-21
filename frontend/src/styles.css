@@ -23,3 +23,4 @@ body {
 .p-component-overlay {
     z-index: 12000 !important;
 }
+@import '@angular/material/prebuilt-themes/indigo-pink.css';

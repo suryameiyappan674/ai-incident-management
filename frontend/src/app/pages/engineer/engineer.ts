@@ -8,22 +8,29 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { IncidentDetailsDialog } from '../incidents/incident-details-dialog/incident-details-dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
 interface Incident {
   incidentId: string;
   title: string;
   priority: string;
+  description:string;
   status: string;
   createdAt: string;
 }
 @Component({
   selector: 'app-engineer',
+  standalone: true,
   imports: [
     CommonModule,
     MatTableModule,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
-    MatCardModule
+    MatCardModule,
+    MatDialogModule,
+    MatInputModule
   ],
   templateUrl: './engineer.html',
   styleUrl: './engineer.css',
@@ -38,13 +45,13 @@ export class Engineer {
     'priority',
     'status',
     'createdAt',
-    'action'
+    // 'action'
   ];
 
 
   incidents: Incident[] = [];
-
-  constructor(private router: Router) { }
+allIncidents: Incident[] = [];
+  constructor(private router: Router,  private dialog: MatDialog) { }
 
 
   ngOnInit() {
@@ -59,8 +66,9 @@ export class Engineer {
 
       {
         incidentId: 'INC-001',
-        title: 'API Down',
+        title: 'API Down ',
         priority: 'Critical',
+        description: "Payment API is not responding",
         status: 'Pending',
         createdAt: '17-Jul-2026'
       },
@@ -69,12 +77,13 @@ export class Engineer {
         incidentId: 'INC-002',
         title: 'Database Timeout',
         priority: 'High',
+        description: "submit API is not responding ",
         status: 'InProgress',
         createdAt: '17-Jul-2026'
       }
 
     ];
-
+  this.allIncidents = [...this.incidents];
   }
 
 
@@ -85,4 +94,42 @@ export class Engineer {
     this.router.navigate(['/login']);
 
   }
+  openIncident(row: Incident): void {
+  this.dialog.open(IncidentDetailsDialog, {
+   
+    width: '900px',
+    height: '850px',
+    maxWidth: '95vw',
+    maxHeight: '95vh',
+    data: row,
+    disableClose: true
+  });
+}
+
+
+searchIncident(event: Event) {
+
+  const value = (event.target as HTMLInputElement)
+    .value
+    .trim()
+    .toLowerCase();
+
+
+  if (!value) {
+
+    this.incidents = this.allIncidents;
+
+    return ;
+
+  }
+
+  this.incidents = this.allIncidents.filter(item =>
+
+    item.incidentId
+      .toLowerCase()
+      .includes(value)
+
+  );
+
+}
 }
