@@ -23,4 +23,19 @@ export class Incident {
   createIncident(data: { title: string; description: string; priority: string }): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
   }
+  
+    /** Update incident status */
+  updateIncidentStatus(
+    incidentId: string,
+    status: string
+  ): Observable<any> {
+
+    return this.http.patch<any>(
+      `${this.apiUrl}/${incidentId}/status`,
+      {
+        status
+      }
+    );
+
+  }
 }

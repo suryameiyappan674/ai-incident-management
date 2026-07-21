@@ -342,5 +342,48 @@ router.delete('/:id/assignments/:assignmentId', authenticateJWT, authorizeRoles(
     next(error);
   }
 });
+router.patch('/:id/status',
+authenticateJWT,
+async(req,res,next)=>{
+
+ try {
+
+   const {status}=req.body;
+
+
+   const incident = await findIncident(req.params.id);
+
+
+   if(!incident){
+
+     return res.status(404).json({
+       message:"Incident not found"
+     });
+
+   }
+
+
+   incident.status=status;
+
+   await incident.save();
+
+
+   res.json({
+
+     message:"Status updated successfully",
+     statusCode:200,
+     data:incident
+
+   });
+
+
+ }
+ catch(error){
+
+   next(error);
+
+ }
+
+});
 
 module.exports = router;
