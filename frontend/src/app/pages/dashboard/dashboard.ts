@@ -84,7 +84,8 @@ setTimeout(() => {
       next: (res: any) => {
         this.isLoading = false;
         if (res?.statusCode === 200 && res?.data) {
-          this.incidents = res.data.incidents || [];
+        this.incidents = [...(res.data.incidents || [])];
+          // console.log("INCIDENTS:", this.incidents);
           this.totalRecords = res.data.total || 0;
           if (res.data.stats) {
             this.dashboard = {
@@ -142,10 +143,8 @@ setTimeout(() => {
     const dialogRef = this.dialog.open(
       AssignIncidentDialog,
       {
-        width: '650px',
-
+        width: '550px',
         disableClose: true,
-
         data: row
       }
     );
@@ -163,8 +162,6 @@ setTimeout(() => {
         row.incidentId,
 
         result.engineer._id,
-
-        result.note || ''
 
       ).subscribe({
 

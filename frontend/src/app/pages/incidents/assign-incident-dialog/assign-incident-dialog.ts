@@ -11,7 +11,7 @@ import {
     MatDialogModule,
     MatDialogRef
 } from '@angular/material/dialog';
-
+import { ChangeDetectorRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -31,7 +31,7 @@ import { Engineer } from '../../../models/engineer';
         MatButtonModule,
         MatFormFieldModule,
         MatInputModule,
-        SelectModule
+        SelectModule,
     ],
     templateUrl: './assign-incident-dialog.html',
     styleUrl: './assign-incident-dialog.css'
@@ -40,6 +40,7 @@ export class AssignIncidentDialog implements OnInit {
 
     private fb = inject(FormBuilder);
     private userService = inject(User);
+    private cdr = inject(ChangeDetectorRef);
 
     dialogRef = inject(MatDialogRef<AssignIncidentDialog>);
     data = inject(MAT_DIALOG_DATA);
@@ -50,7 +51,6 @@ export class AssignIncidentDialog implements OnInit {
 
     form = this.fb.group({
         engineer: this.fb.control<Engineer | null>(null, Validators.required),
-        note: this.fb.control('')
     });
 
     ngOnInit(): void {
@@ -68,13 +68,14 @@ export class AssignIncidentDialog implements OnInit {
                 this.loading = false;
 
                 this.engineers = res.data;
+                 this.cdr.detectChanges();
 
             },
 
             error: () => {
 
                 this.loading = false;
-
+                this.cdr.detectChanges();
             }
 
         });
@@ -94,8 +95,6 @@ export class AssignIncidentDialog implements OnInit {
         this.dialogRef.close({
 
             engineer: this.form.value.engineer,
-
-            note: this.form.value.note
 
         });
 
