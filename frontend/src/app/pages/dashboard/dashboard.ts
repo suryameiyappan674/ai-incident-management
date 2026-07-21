@@ -194,4 +194,12 @@ setTimeout(() => {
   logout() {
     this.authService.logout();
   }
+
+  isAssigned(row: any): boolean {
+    if (!row.assignees || row.assignees.length === 0) {
+      return false;
+    }
+    // Returns true if at least one assignee is different from the creator
+    return row.assignees.some((assignee: any) => assignee._id !== row.createdBy?._id);
+  }
 }
