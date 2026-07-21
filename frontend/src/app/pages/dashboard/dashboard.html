@@ -114,7 +114,7 @@
 
 
       <!-- Assign Column -->
-      <ng-container matColumnDef="assign">
+      <!-- <ng-container matColumnDef="assign">
         <th mat-header-cell *matHeaderCellDef>
           Assign
         </th>
@@ -124,7 +124,34 @@
             Assign
           </button>
         </td>
-      </ng-container>
+      </ng-container> -->
+
+      <!-- Assign Column -->
+<ng-container matColumnDef="assign">
+
+  <th mat-header-cell *matHeaderCellDef>
+    Assign
+  </th>
+
+  <td mat-cell *matCellDef="let row">
+
+    <button
+      *ngIf="currentUser?.role?.name==='admin'"
+      mat-raised-button
+      [ngClass]="row.assignedEngineer ? 'assigned-btn' : 'pending-btn'"
+      (click)="openAssignDialog(row)">
+
+      <mat-icon>
+        {{ row.assignedEngineer ? 'check_circle' : 'person_add' }}
+      </mat-icon>
+
+      {{ row.assignedEngineer ? 'Assigned' : 'Yet to Assign' }}
+
+    </button>
+
+  </td>
+
+</ng-container>
 
       <!-- Created At Column -->
       <ng-container matColumnDef="createdAt">

@@ -176,3 +176,13 @@
     color: #64748b;
     font-style: italic;
 }
+
+.assigned-btn {
+  background-color: #2e7d32 !important;
+  color: white !important;
+}
+
+.pending-btn {
+  background-color: #f9a825 !important;
+  color: white !important;
+}
