@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +9,9 @@ import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create-incident-dialog';
+import { AssignIncidentDialog } from '../incidents/assign-incident-dialog/assign-incident-dialog';
 import { Incident as IncidentService } from '../../services/incident';
+import { Assignment as AssignmentService } from '../../services/assignment';
 import { Auth as AuthService } from '../../services/auth';
 
 @Component({
@@ -30,6 +32,7 @@ import { Auth as AuthService } from '../../services/auth';
 export class Dashboard implements OnInit {
   private dialog = inject(MatDialog);
   private incidentService = inject(IncidentService);
+  private assignmentService = inject(AssignmentService);
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -48,21 +51,30 @@ export class Dashboard implements OnInit {
     'priority',
     'status',
     'createdBy',
+    'assign',
     'createdAt'
   ];
 
   incidents: any[] = [];
+
+  currentUser: any = null;
+
   isLoading = false;
 
   // Pagination status
   totalRecords = 0;
   pageSize = 10;
   currentPage = 0; // 0-indexed for MatPaginator
-
+ 
   ngOnInit() {
-    setTimeout(() => {
+
+    this.currentUser = this.authService.getUser();
+
+    console.log(this.currentUser);
+setTimeout(() => {
       this.fetchData();
     });
+
   }
 
   fetchData() {
@@ -123,6 +135,63 @@ export class Dashboard implements OnInit {
         });
       }
     });
+  }
+
+  openAssignDialog(row: any) {
+
+    const dialogRef = this.dialog.open(
+      AssignIncidentDialog,
+      {
+        width: '650px',
+
+        disableClose: true,
+
+        data: row
+      }
+    );
+
+    dialogRef.afterClosed().subscribe(result => {
+
+      if (!result) {
+
+        return;
+
+      }
+
+      this.assignmentService.assignEngineer(
+
+        row.incidentId,
+
+        result.engineer._id,
+
+        result.note || ''
+
+      ).subscribe({
+
+        next: () => {
+
+          alert("Engineer assigned successfully.");
+
+          this.fetchData();
+
+        },
+
+        error: (err) => {
+
+          alert(
+
+            err.error?.message ||
+
+            "Assignment failed."
+
+          );
+
+        }
+
+      });
+
+    });
+
   }
 
   logout() {

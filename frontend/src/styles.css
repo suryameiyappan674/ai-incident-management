@@ -1,2 +1,26 @@
 /* You can add global styles to this file, and also import other style files */
+@import "primeicons/primeicons.css";
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Roboto, sans-serif;
+    height: 100%;
+}
+
+body {
+    background: #f5f5f5;
+}
+.cdk-overlay-container {
+    z-index: 1000;
+}
+
+.p-select-overlay {
+    z-index: 12000 !important;
+}
+
+.p-component-overlay {
+    z-index: 12000 !important;
+}
 @import '@angular/material/prebuilt-themes/indigo-pink.css';

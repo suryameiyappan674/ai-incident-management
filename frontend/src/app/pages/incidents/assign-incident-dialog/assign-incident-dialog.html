@@ -1,0 +1,132 @@
+<h2 mat-dialog-title>Assign Engineer</h2>
+
+<form [formGroup]="form">
+
+    <div mat-dialog-content>
+
+        <p-select
+            formControlName="engineer"
+            [options]="engineers"
+            optionLabel="username"
+            [filter]="true"
+            filterBy="username,email"
+            [showClear]="true"
+            placeholder="Select Engineer"
+            appendTo="body"
+            styleClass="w-full" 
+      
+    [overlayOptions]="{
+        baseZIndex: 12000
+    }">
+
+            <!-- Selected Engineer -->
+            <ng-template pTemplate="selectedItem" let-engineer>
+
+                <div *ngIf="engineer; else placeholder" class="engineer-option">
+
+                    <div>
+
+                        <strong>{{ engineer.username }}</strong>
+                        <br>
+
+                        <small>{{ engineer.email }}</small>
+
+                    </div>
+
+                </div>
+
+            </ng-template>
+
+            <!-- Placeholder -->
+            <ng-template #placeholder>
+
+                <span>Select Engineer</span>
+
+            </ng-template>
+
+            <!-- Dropdown Item -->
+            <ng-template pTemplate="item" let-engineer>
+
+                <div class="engineer-option">
+
+                    <div>
+
+                        <strong>{{ engineer.username }}</strong>
+                        <br>
+
+                        <small>{{ engineer.email }}</small>
+
+                    </div>
+
+                    <span
+                        class="badge"
+                        [ngClass]="{
+                            low: engineer.activeIncidents <= 2,
+                            medium: engineer.activeIncidents > 2 && engineer.activeIncidents <= 5,
+                            high: engineer.activeIncidents > 5
+                        }">
+
+                        {{ engineer.activeIncidents }} Active
+
+                    </span>
+
+                </div>
+
+            </ng-template>
+
+        </p-select>
+
+        <!-- Selected Engineer Details -->
+
+        <div class="selected-engineer" *ngIf="selectedEngineer">
+
+            <h4>Selected Engineer</h4>
+
+            <p>
+
+                <strong>{{ selectedEngineer.username }}</strong>
+
+            </p>
+
+            <p>
+
+                {{ selectedEngineer.email }}
+
+            </p>
+
+            <p>
+
+                Active Incidents:
+                {{ selectedEngineer.activeIncidents }}
+
+            </p>
+
+        </div>
+
+    </div>
+
+</form>
+
+<div mat-dialog-actions align="end">
+
+    <button
+        mat-button
+        type="button"
+        (click)="dialogRef.close()">
+
+        Cancel
+
+    </button>
+
+    <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        (click)="confirm()"
+        [disabled]="form.invalid">
+
+        Confirm Assignment
+
+    </button>
+
+</div>

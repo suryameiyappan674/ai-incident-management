@@ -1,12 +1,24 @@
 <div class="dashboard-container">
 
   <div class="header">
-    <h2>Incident Intelligence Dashboard</h2>
+    <div>
+      <h2>Incident Intelligence Dashboard</h2>
+
+      <p *ngIf="currentUser">
+        Welcome,
+        <strong>{{ currentUser.username }}</strong>
+        ({{ currentUser.role?.name }})
+      </p>
+    </div>
 
     <div class="actions">
-      <button mat-raised-button color="primary" (click)="openCreateIncident()">
+      <button *ngIf="currentUser?.role?.name === 'admin'" mat-raised-button color="primary"
+        (click)="openCreateIncident()">
+
         <mat-icon>add</mat-icon>
+
         Create Incident
+
       </button>
 
       <button mat-button color="warn" (click)="logout()">
@@ -97,6 +109,20 @@
         <th mat-header-cell *matHeaderCellDef>Raised By</th>
         <td mat-cell *matCellDef="let row">
           {{row.createdBy?.username || 'System'}}
+        </td>
+      </ng-container>
+
+
+      <!-- Assign Column -->
+      <ng-container matColumnDef="assign">
+        <th mat-header-cell *matHeaderCellDef>
+          Assign
+        </th>
+        <td mat-cell *matCellDef="let row">
+          <button *ngIf="currentUser?.role?.name==='admin'" mat-raised-button color="primary"
+            (click)="openAssignDialog(row)">
+            Assign
+          </button>
         </td>
       </ng-container>
 
