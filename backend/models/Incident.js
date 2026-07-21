@@ -28,10 +28,10 @@ const incidentSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: {
-      values: ['Open', 'In Progress', 'Resolved', 'Closed'],
-      message: 'Status must be one of: Open, In Progress, Resolved, Closed'
+      values: ['Pending', 'In Progress', 'Resolved', 'Closed'],
+      message: 'Status must be one of: Pending, In Progress, Resolved, Closed'
     },
-    default: 'Open'
+    default: 'Pending'
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
