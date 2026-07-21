@@ -66,8 +66,10 @@ export class Engineer implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.loadUser();
-    this.loadIncidents();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadUser();
+      this.loadIncidents();
+    }
   }
 
   // ✅ Load user from localStorage
