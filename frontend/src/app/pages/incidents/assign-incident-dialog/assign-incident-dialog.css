@@ -1,0 +1,56 @@
+.full-width-select {
+    width: 100%;
+}
+
+:host ::ng-deep .p-select {
+    width: 100%;
+}
+
+:host ::ng-deep .p-select-label {
+    padding: 0.85rem;
+}
+
+:host ::ng-deep .p-select-overlay {
+    border-radius: 10px;
+}
+
+:host ::ng-deep .p-select-item {
+    padding: 12px;
+}
+
+.engineer-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: white;
+}
+
+.low {
+    background: #2e7d32;
+}
+
+.medium {
+    background: #f9a825;
+}
+
+.high {
+    background: #c62828;
+}
+
+.selected-engineer {
+    margin-top: 20px;
+    padding: 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+}
+:host ::ng-deep .p-select-overlay {
+    z-index: 100000 !important;
+}

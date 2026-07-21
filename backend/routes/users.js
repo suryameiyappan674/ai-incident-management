@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Role = require('../models/Role');
+const Incident = require('../models/Incident');
+const IncidentAssignment = require('../models/IncidentAssignment');
 const { authenticateJWT, authorizeRoles, authorizePermissions } = require('../middleware/auth');
 
 // Generate JWT Helper
@@ -83,6 +86,92 @@ router.get('/me', authenticateJWT, async (req, res) => {
     }
   });
 });
+
+/* GET all engineers (Admin only). */
+router.get(
+  '/engineers',
+  authenticateJWT,
+  authorizeRoles('admin'),
+  async (req, res, next) => {
+
+    try {
+
+      // Engineer Role
+      const engineerRole = await Role.findOne({
+        name: 'engineer'
+      });
+
+      if (!engineerRole) {
+        return res.status(404).json({
+          message: 'Engineer role not found'
+        });
+      }
+
+      const engineers = await User.find({
+        role: engineerRole._id
+      })
+        .populate('role', 'name')
+        .select('_id username email role');
+
+      const result = [];
+
+      for (const engineer of engineers) {
+
+        // assignments of this engineer
+        const assignments = await IncidentAssignment.find({
+          assignee: engineer._id
+        }).populate('incident');
+
+        // Count only active incidents
+        const activeIncidents = assignments.filter(a => {
+
+          return (
+            a.incident &&
+            a.incident.status !== 'Resolved' &&
+            a.incident.status !== 'Closed'
+          );
+
+        }).length;
+
+        result.push({
+
+          _id: engineer._id,
+
+          username: engineer.username,
+
+          email: engineer.email,
+
+          role: engineer.role.name,
+
+          activeIncidents
+
+        });
+
+      }
+
+      result.sort((a, b) =>
+
+        a.activeIncidents - b.activeIncidents
+
+      );
+
+      res.json({
+
+        statusCode: 200,
+
+        message: "Engineers fetched successfully",
+
+        data: result
+
+      });
+
+    } catch (err) {
+
+      next(err);
+
+    }
+
+  });
 
 /* GET admin-only protected resource. */
 router.get('/admin-only', authenticateJWT, authorizeRoles('admin'), (req, res) => {

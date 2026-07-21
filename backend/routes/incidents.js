@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Incident = require('../models/Incident');
 const IncidentAssignment = require('../models/IncidentAssignment');
-const { authenticateJWT } = require('../middleware/auth');
+const { authenticateJWT, authorizeRoles } = require('../middleware/auth');
 
 /* ------------------------------------------------------------------ */
 /*  Helper — resolve incident by INC-XXXX or MongoDB ObjectId          */
@@ -150,7 +150,7 @@ router.get('/:id', authenticateJWT, async (req, res, next) => {
 /*  POST /:id/assignments — Assign a user to an incident              */
 /*  Body: { assigneeId, note? }                                        */
 /* ------------------------------------------------------------------ */
-router.post('/:id/assignments', authenticateJWT, async (req, res, next) => {
+router.post('/:id/assignments', authenticateJWT, authorizeRoles('admin'), async (req, res, next) => {
   try {
     const { assigneeId, note } = req.body;
 
@@ -235,7 +235,7 @@ router.get('/:id/assignments', authenticateJWT, async (req, res, next) => {
 /* ------------------------------------------------------------------ */
 /*  DELETE /:id/assignments/:assignmentId — Remove an assignment       */
 /* ------------------------------------------------------------------ */
-router.delete('/:id/assignments/:assignmentId', authenticateJWT, async (req, res, next) => {
+router.delete('/:id/assignments/:assignmentId', authenticateJWT, authorizeRoles('admin'), async (req, res, next) => {
   try {
     const incident = await findIncident(req.params.id);
     if (!incident) {

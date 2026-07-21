@@ -5,12 +5,19 @@ import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
-    provideHttpClient(withFetch(), withInterceptors([authInterceptor]))
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
+    providePrimeNG({
+    theme: {
+        preset: Aura
+    }
+}),
   ]
 };
