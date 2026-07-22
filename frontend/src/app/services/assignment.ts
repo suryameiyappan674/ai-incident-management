@@ -8,7 +8,8 @@ export class Assignment {
 
     private http = inject(HttpClient);
 
-    private baseUrl = 'http://localhost:3000/api/v1/incidents';
+    // private baseUrl = 'http://localhost:3000/api/v1/incidents';
+    private baseUrl = 'http://10.68.10.106:3000/api/v1/incidents';
 
     constructor() { }
 

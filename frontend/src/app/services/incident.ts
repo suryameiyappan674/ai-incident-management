@@ -7,7 +7,9 @@ import { Observable } from 'rxjs';
 })
 export class Incident {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/v1/incidents';
+  // private apiUrl = 'http://localhost:3000/api/v1/incidents';
+  private apiUrl = 'http://10.68.10.106:3000/api/v1/incidents';
+
 
   /** Fetch paginated incidents */
   getIncidents(page: number = 1, limit: number = 10): Observable<any> {

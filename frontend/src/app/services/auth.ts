@@ -24,7 +24,9 @@ export class Auth {
 
   // }
 
-  private baseUrl = 'http://localhost:3000/api/v1/users';
+  // private baseUrl = 'http://localhost:3000/api/v1/users';
+  private baseUrl = 'http://10.68.10.106:3000/api/v1/users';
+
 
   /** POST /api/v1/users/login */
   login(data: { email: string; password: string }) {
