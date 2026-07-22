@@ -210,9 +210,8 @@
 
     <div class="chat-box" #chatScrollBox>
 
-      <div class="message" 
-           *ngFor="let msg of chatMessages"
-           [ngClass]="msg.sender === currentUser ? 'outgoing' : 'incoming'">
+      <div class="message" *ngFor="let msg of chatMessages"
+        [ngClass]="msg.sender === currentUser ? 'outgoing' : 'incoming'">
         <strong>{{ msg.sender }}:</strong> {{ msg.text }}
       </div>
 
@@ -241,7 +240,7 @@
 <mat-dialog-actions align="end">
 
   <ng-container *ngIf="role !== 'user'">
-    <button mat-raised-button color=" warn" *ngIf="data.status==='Open' || data.status==='Pending'"
+    <button mat-raised-button color="warn" *ngIf="data.status==='Open' || data.status==='Pending'"
       (click)="changeStatus('In Progress')">
 
       In Progress
