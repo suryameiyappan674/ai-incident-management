@@ -220,13 +220,35 @@ export class IncidentDetailsDialog implements OnInit, OnDestroy {
     this.isGeneratingAI = true;
     this.cdr.detectChanges(); // Update UI to show spinner
 
-    this.incidentService.analyzeIncident(this.data.title, this.data.description || '').subscribe({
+    this.incidentService.analyzeIncident(this.data.title, this.data.description || '', this.data.priority).subscribe({
       next: (res) => {
         this.isGeneratingAI = false;
-        if (res && res.analysis) {
+
+        // Handle new structured JSON response
+        if (res && res.category) {
+          let stepsHtml = '';
+          if (res.steps && Array.isArray(res.steps)) {
+            stepsHtml = '<ul>' + res.steps.map((step: string) => `<li>${step}</li>`).join('') + '</ul>';
+          }
+
+          this.formattedAiContent = `
+            <p><strong>Category:</strong> ${res.category || 'N/A'}</p>
+            <p><strong>Severity:</strong> ${res.severity || 'N/A'}</p>
+            <p><strong>Confidence:</strong> ${(res.confidence ? (res.confidence * 100).toFixed(0) + '%' : 'N/A')}</p>
+            <p><strong>Summary:</strong> ${res.summary || 'N/A'}</p>
+            <p><strong>Root Cause (Potential):</strong> ${res.root_cause || 'N/A'}</p>
+            <p><strong>Recommended Skill:</strong> ${res.recommended_engineer_skill || 'N/A'}</p>
+            <p><strong>Resolution Steps:</strong></p>
+            ${stepsHtml}
+          `;
+          this.aiContent = res;
+        }
+        // Fallback for older markdown response
+        else if (res && res.analysis) {
           this.aiContent = res.analysis;
           this.formattedAiContent = this.formatReadable(res.analysis);
-        } else {
+        }
+        else {
           this.aiContent = 'No analysis returned from the server.';
           this.formattedAiContent = this.aiContent;
         }
