@@ -1,7 +1,9 @@
 import json
 
+from google.genai import types
+
 from app.prompts.system_prompt import SYSTEM_PROMPT
-from app.services.gemini import model
+from app.services.gemini import client
 
 
 def analyze_incident(request):
@@ -25,6 +27,12 @@ Previous Similar Incidents:
 {json.dumps(request.similar_incidents, indent=2)}
 """
 
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json"
+        )
+    )
 
     return json.loads(response.text)
