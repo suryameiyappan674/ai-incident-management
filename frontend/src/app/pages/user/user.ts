@@ -12,6 +12,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 
 import { IncidentDetailsDialog } from '../incidents/incident-details-dialog/incident-details-dialog';
+import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create-incident-dialog';
 import { Incident as IncidentService } from '../../services/incident';
 
 interface Incident {
@@ -114,6 +115,29 @@ export class User implements OnInit {
   logout() {
     localStorage.clear();
     this.router.navigate(['/login']);
+  }
+
+  // ✅ Open create incident dialog
+  openCreateIncident() {
+    const dialogRef = this.dialog.open(CreateIncidentDialog, {
+      width: '400px',
+      height: '500px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.incidentService.createIncident(result).subscribe({
+          next: () => {
+            this.loadIncidents();
+          },
+          error: (err) => {
+            console.error(err);
+            alert(err?.error?.message || 'Failed to create incident');
+          }
+        });
+      }
+    });
   }
 
   // ✅ Open dialog

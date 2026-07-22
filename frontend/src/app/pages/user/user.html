@@ -9,6 +9,11 @@
         Welcome, {{ engineerName }}
       </span>
 
+      <button mat-raised-button color="primary" (click)="openCreateIncident()" style="margin-right: 10px;">
+        <mat-icon>add</mat-icon>
+        Create Incident
+      </button>
+
       <button mat-icon-button color="warn" (click)="logout()" matTooltip="Logout">
         <mat-icon>logout</mat-icon>
       </button>
