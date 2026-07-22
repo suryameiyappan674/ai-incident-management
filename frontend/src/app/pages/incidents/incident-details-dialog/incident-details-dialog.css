@@ -306,12 +306,13 @@ h3 {
 }
 
 
-.user {
+.incoming {
   background:#e0e0e0;
+  margin-right:auto;
 }
 
 
-.engineer {
+.outgoing {
   background:#bbdefb;
   margin-left:auto;
 }

@@ -3,9 +3,12 @@ import {
   Inject,
   inject,
   ChangeDetectorRef,
+  OnInit,
+  OnDestroy
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 import {
   MAT_DIALOG_DATA,
@@ -32,6 +35,8 @@ import {
 import {
   Incident as IncidentService
 } from '../../../services/incident';
+
+import { Centrifuge } from 'centrifuge';
 
 
 
@@ -61,11 +66,12 @@ interface Incident {
 
   imports: [
     CommonModule,
+    FormsModule,
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule // Ensures the spinner module is loaded
   ],
 
   templateUrl: './incident-details-dialog.html',
@@ -75,7 +81,7 @@ interface Incident {
 })
 
 
-export class IncidentDetailsDialog {
+export class IncidentDetailsDialog implements OnInit, OnDestroy {
 
 
   similarIncidents: Incident[] = [];
@@ -85,6 +91,13 @@ export class IncidentDetailsDialog {
 
   aiContent: any;
   formattedAiContent = '';
+  role: any;
+
+  currentUser: string = '';
+  chatMessage: string = '';
+  chatMessages: { sender: string; role: string; text: string }[] = [];
+  centrifuge: any;
+  chatSubscription: any;
 
 
 
@@ -99,7 +112,69 @@ export class IncidentDetailsDialog {
     @Inject(MAT_DIALOG_DATA)
     public data: Incident
   ) {
+    const userInfo = localStorage.getItem('user');
+    if (userInfo) {
+      const user = JSON.parse(userInfo);
+      this.role = user.role.name;
+      this.currentUser = user.username;
+    }
     this.findSimilarIncidents();
+  }
+
+  ngOnInit() {
+    this.initCentrifugo();
+  }
+
+  ngOnDestroy() {
+    if (this.centrifuge) {
+      this.centrifuge.disconnect();
+    }
+  }
+
+  initCentrifugo() {
+    // Connect to Centrifugo WebSocket
+    this.centrifuge = new Centrifuge("ws://10.68.10.106:8000/connection/websocket", {
+      token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM3MjIiLCJleHAiOjE3ODUzMTExNDksImlhdCI6MTc4NDcwNjM0OX0.lPuKb7O0afng8prpSTKFaaqrF98PFDLdl4xB_aK9CUM"
+    });
+
+    this.centrifuge.on('connecting', (ctx: any) => {
+      console.log(`connecting: ${ctx.code}, ${ctx.reason}`);
+    }).on('connected', (ctx: any) => {
+      console.log(`connected over ${ctx.transport}`);
+    }).on('disconnected', (ctx: any) => {
+      console.log(`disconnected: ${ctx.code}, ${ctx.reason}`);
+    }).connect();
+
+    // Subscribe to incident-specific channel
+    const channelName = `chat-${this.data.incidentId}`;
+    this.chatSubscription = this.centrifuge.newSubscription(channelName);
+
+    this.chatSubscription.on('publication', (ctx: any) => {
+      this.chatMessages.push(ctx.data);
+      this.cdr.detectChanges();
+    }).subscribe();
+  }
+
+  sendMessage() {
+    if (!this.chatMessage.trim()) return;
+
+    const data = {
+      sender: this.currentUser,
+      role: this.role,
+      text: this.chatMessage
+    };
+
+    // Client-side publish to Centrifugo channel
+    this.chatSubscription.publish(data).then(() => {
+      this.chatMessage = '';
+    }).catch((err: any) => {
+      console.error('Publish error', err);
+      // Fallback: If Centrifugo doesn't allow client-side publishing, just push it locally 
+      // (in a real app, you'd send an HTTP request to the backend to publish)
+      this.chatMessages.push(data);
+      this.chatMessage = '';
+      this.cdr.detectChanges();
+    });
   }
 
   findSimilarIncidents() {

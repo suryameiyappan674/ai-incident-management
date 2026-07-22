@@ -111,7 +111,7 @@
 
 
 
-  <div class="ai-section">
+  <div class="ai-section" *ngIf="role === 'engineer'">
 
     <h3>
       AI Assistant Analysis
@@ -141,7 +141,8 @@
       <div class="ai-result" *ngIf="aiGenerated">
 
         <!-- Spinner shown while loading -->
-        <div *ngIf="isGeneratingAI" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+        <div *ngIf="isGeneratingAI"
+          style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
           <mat-spinner diameter="40"></mat-spinner>
           <p style="margin-top: 15px; font-weight: 500; color: #555;">Analyzing Incident...</p>
         </div>
@@ -155,9 +156,7 @@
           <!-- IMPORTANT: We MUST use a <div> here instead of a <textarea>. 
                A <textarea> cannot render HTML tags (like bold and bullet points), 
                it only shows raw text. -->
-          <div
-            class="ai-formatted-content"
-            [innerHTML]="formattedAiContent"
+          <div class="ai-formatted-content" [innerHTML]="formattedAiContent"
             style="white-space: pre-wrap; font-family: inherit; line-height: 1.6; padding: 12px; background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; max-height: 350px; overflow-y: auto; text-align: left; margin-top: 10px;">
           </div>
         </div>
@@ -169,7 +168,7 @@
 
   </div>
 
-  <div class="similar-section">
+  <div class="similar-section" *ngIf="role === 'engineer'">
     <h3>
       Similar Incidents
     </h3>
@@ -209,42 +208,22 @@
     </h3>
 
 
-    <div class="chat-box">
+    <div class="chat-box" #chatScrollBox>
 
-
-      <div class="message user">
-        User: The API stopped working suddenly.
+      <div class="message" 
+           *ngFor="let msg of chatMessages"
+           [ngClass]="msg.sender === currentUser ? 'outgoing' : 'incoming'">
+        <strong>{{ msg.sender }}:</strong> {{ msg.text }}
       </div>
 
-
-      <div class="message engineer">
-        Engineer: I am checking the logs.
-      </div>
-
-      <div class="message user">
-        User: The API stopped working suddenly.
-      </div>
-
-
-      <div class="message engineer">
-        Engineer: I am checking the logs.
-      </div>
-      <div class="message user">
-        User: The API stopped working suddenly.
-      </div>
-
-
-      <div class="message engineer">
-        Engineer: I am checking the logs.
-      </div>
     </div>
 
 
 
     <div class="chat-input">
 
-      <input matInput placeholder="Type message...">
-      <button mat-raised-button color="primary">
+      <input matInput placeholder="Type message..." [(ngModel)]="chatMessage" (keyup.enter)="sendMessage()">
+      <button mat-raised-button color="primary" (click)="sendMessage()">
         Send
       </button>
 
@@ -261,17 +240,18 @@
 
 <mat-dialog-actions align="end">
 
+  <ng-container *ngIf="role !== 'user'">
+    <button mat-raised-button color=" warn" *ngIf="data.status==='Open' || data.status==='Pending'"
+      (click)="changeStatus('In Progress')">
 
-  <button mat-raised-button color="warn" *ngIf="data.status==='Open' || data.status==='Pending'"
-    (click)="changeStatus('In Progress')">
+      In Progress
 
-    In Progress
+    </button>
 
-  </button>
-
-  <button mat-raised-button color="primary" *ngIf="data.status!=='Resolved'" (click)="changeStatus('Resolved')">
-    Resolve
-  </button>
+    <button mat-raised-button color="primary" *ngIf="data.status!=='Resolved'" (click)=" changeStatus('Resolved')">
+      Resolve
+    </button>
+  </ng-container>
 
 
   <button mat-raised-button color="primary" mat-dialog-close>
