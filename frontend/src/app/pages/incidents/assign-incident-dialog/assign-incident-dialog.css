@@ -69,3 +69,10 @@
 :host ::ng-deep .mdc-dialog__surface {
     overflow: visible !important;
 }
+.assigned-card {
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+  background: #fafafa;
+  border-radius: 8px;
+}
