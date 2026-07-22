@@ -14,7 +14,7 @@
             placeholder="Select Engineer"
             appendTo="self"
             styleClass="w-full" 
-       scrollHeight="100px"
+       scrollHeight="130px"
     [overlayOptions]="{
         mode: 'overlay',
         autoZIndex: true,
@@ -77,6 +77,12 @@
             </ng-template>
 
         </p-select>
+        
+<div class="assigned-card" *ngFor="let item of assignedEngineers">
+  <strong>{{ item.assignee.username }}</strong><br>
+  {{ item.assignee.email }}<br>
+  <small>Assigned by {{ item.assignedBy?.username }}</small>
+</div>
 
         <!-- Selected Engineer Details -->
 

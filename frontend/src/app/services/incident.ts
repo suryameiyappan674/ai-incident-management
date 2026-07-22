@@ -23,8 +23,8 @@ export class Incident {
   createIncident(data: { title: string; description: string; priority: string }): Observable<any> {
     return this.http.post<any>(this.apiUrl, data);
   }
-  
-    /** Update incident status */
+
+  /** Update incident status */
   updateIncidentStatus(
     incidentId: string,
     status: string
@@ -37,5 +37,15 @@ export class Incident {
       }
     );
 
+  }
+
+  /** Analyze incident using AI service */
+  analyzeIncident(title: string, description: string, priority: string): Observable<any> {
+    return this.http.post<any>('http://10.68.10.169:8000/incident/analyze', {
+      title,
+      description,
+      priority,
+      "similar_incidents": []
+    });
   }
 }

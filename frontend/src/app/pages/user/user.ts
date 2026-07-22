@@ -1,95 +1,178 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { CommonModule } from '@angular/common';
-import { isPlatformBrowser } from '@angular/common';
-import { inject, PLATFORM_ID } from '@angular/core';
-import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create-incident-dialog';
-interface IncidentData {
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID } from '@angular/core';
 
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
+
+import { IncidentDetailsDialog } from '../incidents/incident-details-dialog/incident-details-dialog';
+import { CreateIncidentDialog } from '../incidents/create-incident-dialog/create-incident-dialog';
+import { Incident as IncidentService } from '../../services/incident';
+
+interface Incident {
   incidentId: string;
   title: string;
   priority: string;
+  description: string;
   status: string;
   createdAt: string;
-
 }
+
 @Component({
   selector: 'app-user',
+  standalone: true,
   imports: [
     CommonModule,
-    MatCardModule,
     MatTableModule,
-    MatButtonModule,
+    MatCardModule,
     MatIconModule,
-    MatTooltipModule
+    MatButtonModule,
+    MatTooltipModule,
+    MatDialogModule,
+    MatInputModule
   ],
   templateUrl: './user.html',
   styleUrl: './user.css',
-  standalone: true,
 })
-export class User {
-  platformId = inject(PLATFORM_ID);
-  userName: any;
-  displayedColumns = [
+export class User implements OnInit {
 
+  private platformId = inject(PLATFORM_ID);
+  private incidentService = inject(IncidentService);
+
+  engineerName: string = '';
+
+  displayedColumns: string[] = [
     'incidentId',
     'title',
     'priority',
     'status',
     'createdAt'
-
   ];
 
-  incidents: IncidentData[] = [];
+  // ✅ Main Data Source
+  dataSource = new MatTableDataSource<Incident>();
 
+  // ✅ Backup for search
+  allIncidents: Incident[] = [];
 
   constructor(
     private router: Router,
-    private dialog: MatDialog,
+    private dialog: MatDialog
   ) { }
-  ngOnInit() {
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadUser();
+      this.loadIncidents();
+    }
+  }
+
+  // ✅ Load user from localStorage
+  loadUser() {
     if (isPlatformBrowser(this.platformId)) {
       const userInfo = localStorage.getItem('user');
       if (userInfo) {
         const user = JSON.parse(userInfo);
-        this.userName = user.username;
+        this.engineerName = user.username;
       }
     }
-    this.incidents = [
-
-      {
-        incidentId: 'INC-001',
-        title: 'API Down',
-        priority: 'Critical',
-        status: 'Pending',
-        createdAt: '17-Jul-2026'
-      },
-
-    ];
-
   }
 
-  openCreateIncident() {
+  // ✅ Load incidents from API
+  loadIncidents() {
+    this.incidentService.getIncidents().subscribe({
+      next: (response) => {
+        if (response?.statusCode === 200 && response?.data?.incidents) {
 
-    this.dialog.open(CreateIncidentDialog, {
+          const formatted = response.data.incidents.map((incident: any) => ({
+            ...incident,
+            createdAt: new Date(incident.createdAt)
+              .toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+              })
+              .replace(/ /g, '-')
+          }));
+
+          this.allIncidents = formatted;
+          this.dataSource.data = formatted; // ✅ Important
+        }
+      },
+      error: (err) => {
+        console.error('Error fetching assignments', err);
+      }
+    });
+  }
+
+  // ✅ Logout
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/login']);
+  }
+
+  // ✅ Open create incident dialog
+  openCreateIncident() {
+    const dialogRef = this.dialog.open(CreateIncidentDialog, {
       width: '400px',
       height: '500px',
       disableClose: true
     });
 
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.incidentService.createIncident(result).subscribe({
+          next: () => {
+            this.loadIncidents();
+          },
+          error: (err) => {
+            console.error(err);
+            alert(err?.error?.message || 'Failed to create incident');
+          }
+        });
+      }
+    });
   }
 
-  logout() {
+  // ✅ Open dialog
+  openIncident(row: Incident): void {
+    const dialogRef = this.dialog.open(IncidentDetailsDialog, {
+      width: '900px',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      data: row,
+      disableClose: true,
+      panelClass: 'incident-dialog'
+    });
+    dialogRef.afterClosed().subscribe(result => {
 
-    localStorage.clear();
+      if (result?.updated) {
+        this.loadIncidents();   // Refresh table automatically
+      }
 
-    this.router.navigate(['/login']);
+    });
+  }
 
+  // ✅ Search
+  searchIncident(event: Event) {
+    const value = (event.target as HTMLInputElement)
+      .value
+      .trim()
+      .toLowerCase();
+
+    if (!value) {
+      this.dataSource.data = this.allIncidents;
+      return;
+    }
+
+    this.dataSource.data = this.allIncidents.filter(item =>
+      item.incidentId.toLowerCase().includes(value)
+    );
   }
 }

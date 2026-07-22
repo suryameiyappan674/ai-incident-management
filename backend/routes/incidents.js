@@ -72,11 +72,20 @@ router.get('/', authenticateJWT, async (req, res, next) => {
     if (priority) filter.priority = priority;
     if (status) filter.status = status;
 
-    // Role-based filtering: admins see all incidents; non-admins see only assigned incidents
-    if (req.user.role && req.user.role.name !== 'admin') {
+    // Role-based filtering: admins see all incidents; non-admins see only assigned incidents OR incidents they created
+    if (req.user.role && req.user.role.name == 'engineer') {
       const assignments = await IncidentAssignment.find({ assignee: req.user._id }).select('incident');
       const incidentIds = assignments.map(a => a.incident);
-      filter._id = { $in: incidentIds };
+
+      // They can see incidents assigned to them OR incidents they created
+      filter.$or = [
+        { _id: { $in: incidentIds } },
+        { createdBy: req.user._id }
+      ];
+    } else if (req.user.role && req.user.role.name == 'user') {
+      filter.$or = [
+        { createdBy: req.user._id }
+      ];
     }
 
     const skip = (Number(page) - 1) * Number(limit);
@@ -343,47 +352,47 @@ router.delete('/:id/assignments/:assignmentId', authenticateJWT, authorizeRoles(
   }
 });
 router.patch('/:id/status',
-authenticateJWT,
-async(req,res,next)=>{
+  authenticateJWT,
+  async (req, res, next) => {
 
- try {
+    try {
 
-   const {status}=req.body;
-
-
-   const incident = await findIncident(req.params.id);
+      const { status } = req.body;
 
 
-   if(!incident){
-
-     return res.status(404).json({
-       message:"Incident not found"
-     });
-
-   }
+      const incident = await findIncident(req.params.id);
 
 
-   incident.status=status;
+      if (!incident) {
 
-   await incident.save();
+        return res.status(404).json({
+          message: "Incident not found"
+        });
 
-
-   res.json({
-
-     message:"Status updated successfully",
-     statusCode:200,
-     data:incident
-
-   });
+      }
 
 
- }
- catch(error){
+      incident.status = status;
 
-   next(error);
+      await incident.save();
 
- }
 
-});
+      res.json({
+
+        message: "Status updated successfully",
+        statusCode: 200,
+        data: incident
+
+      });
+
+
+    }
+    catch (error) {
+
+      next(error);
+
+    }
+
+  });
 
 module.exports = router;
