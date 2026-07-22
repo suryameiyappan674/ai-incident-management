@@ -38,4 +38,12 @@ export class Incident {
     );
 
   }
+
+  /** Analyze incident using AI service */
+  analyzeIncident(title: string, description: string): Observable<any> {
+    return this.http.post<any>('http://127.0.0.1:8000/api/v1/incidents/analyze', {
+      title,
+      description
+    });
+  }
 }
