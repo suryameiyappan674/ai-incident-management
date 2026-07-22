@@ -1,7 +1,8 @@
 import {
   Component,
   Inject,
-  inject
+  inject,
+  ChangeDetectorRef,
 } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -23,6 +24,10 @@ import {
 import {
   MatTooltipModule
 } from '@angular/material/tooltip';
+
+import {
+  MatProgressSpinnerModule
+} from '@angular/material/progress-spinner';
 
 import {
   Incident as IncidentService
@@ -59,7 +64,8 @@ interface Incident {
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatProgressSpinnerModule
   ],
 
   templateUrl: './incident-details-dialog.html',
@@ -75,39 +81,29 @@ export class IncidentDetailsDialog {
   similarIncidents: Incident[] = [];
 
   aiGenerated = false;
+  isGeneratingAI = false;
 
-  aiContent = '';
+  aiContent: any;
+  formattedAiContent = '';
 
 
 
   private incidentService = inject(IncidentService);
-
+  private cdr = inject(ChangeDetectorRef);
 
   private dialogRef = inject(
     MatDialogRef<IncidentDetailsDialog>
   );
 
-
-
   constructor(
-
     @Inject(MAT_DIALOG_DATA)
     public data: Incident
-
   ) {
-
     this.findSimilarIncidents();
-
   }
 
-
-
-
   findSimilarIncidents() {
-
-
     const previousIncidents: Incident[] = [
-
       {
         incidentId: 'INC-003',
         title: 'API Down',
@@ -116,8 +112,6 @@ export class IncidentDetailsDialog {
         status: 'Resolved',
         createdAt: '10-Jul-2026'
       },
-
-
       {
         incidentId: 'INC-004',
         title: 'Database Timeout',
@@ -126,61 +120,51 @@ export class IncidentDetailsDialog {
         status: 'Resolved',
         createdAt: '12-Jul-2026'
       }
-
     ];
 
-
-
-    this.similarIncidents =
-      previousIncidents.filter(
-        incident =>
-
-          incident.status === 'Resolved'
-
-          &&
-
-          incident.title
-            .toLowerCase()
-            .includes(
-              this.data.title.toLowerCase()
-            )
-
-      );
-
-
+    this.similarIncidents = previousIncidents.filter(
+      incident => incident.status === 'Resolved' && incident.title.toLowerCase().includes(this.data.title.toLowerCase())
+    );
   }
 
-
-
-
+  formatReadable(text: string): string {
+    if (!text) return '';
+    return text
+      // Bold text
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      // Italics
+      .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>')
+      // Bullet points (convert to HTML entity)
+      .replace(/(\n|^)\s*\*\s+(.*)/g, '$1&bull; $2')
+      // Newlines to <br> for proper spacing
+      .replace(/\n/g, '<br/>');
+  }
 
   generateAIAnalysis() {
-
-
     this.aiGenerated = true;
+    this.isGeneratingAI = true;
+    this.cdr.detectChanges(); // Update UI to show spinner
 
-
-    this.aiContent = `
-
-Incident Summary:
-
-The incident priority is ${this.data.priority}.
-
-
-Recommended Actions:
-
-1. Check application logs.
-2. Verify server health.
-3. Review deployments.
-4. Monitor database.
-
-
-Suggested Resolution:
-
-Investigate root cause and apply fix.
-
-`;
-
+    this.incidentService.analyzeIncident(this.data.title, this.data.description || '').subscribe({
+      next: (res) => {
+        this.isGeneratingAI = false;
+        if (res && res.analysis) {
+          this.aiContent = res.analysis;
+          this.formattedAiContent = this.formatReadable(res.analysis);
+        } else {
+          this.aiContent = 'No analysis returned from the server.';
+          this.formattedAiContent = this.aiContent;
+        }
+        this.cdr.detectChanges(); // Tell Angular to re-render the view
+      },
+      error: (err) => {
+        this.isGeneratingAI = false;
+        console.error('Error generating AI analysis:', err);
+        this.aiContent = 'Failed to generate AI analysis. Please ensure the AI backend is running on port 8000.';
+        this.formattedAiContent = this.aiContent;
+        this.cdr.detectChanges(); // Tell Angular to re-render the view
+      }
+    });
   }
 
 
