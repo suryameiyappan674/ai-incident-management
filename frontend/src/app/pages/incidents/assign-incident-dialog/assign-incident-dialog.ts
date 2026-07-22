@@ -20,6 +20,7 @@ import { SelectModule } from 'primeng/select';
 
 import { User } from '../../../services/user';
 import { Engineer } from '../../../models/engineer';
+import { Assignment } from '../../../services/assignment';
 
 @Component({
     selector: 'app-assign-incident-dialog',
@@ -41,6 +42,7 @@ export class AssignIncidentDialog implements OnInit {
     private fb = inject(FormBuilder);
     private userService = inject(User);
     private cdr = inject(ChangeDetectorRef);
+    private assignmentService = inject(Assignment);
 
     dialogRef = inject(MatDialogRef<AssignIncidentDialog>);
     data = inject(MAT_DIALOG_DATA);
@@ -48,13 +50,14 @@ export class AssignIncidentDialog implements OnInit {
     engineers: Engineer[] = [];
 
     loading = false;
-
+assignedEngineers: any[] = [];
     form = this.fb.group({
         engineer: this.fb.control<Engineer | null>(null, Validators.required),
     });
 
     ngOnInit(): void {
         this.loadEngineers();
+         this.loadAssignedEngineers();
     }
 
     loadEngineers() {
@@ -99,5 +102,18 @@ export class AssignIncidentDialog implements OnInit {
         });
 
     }
+ loadAssignedEngineers() {
+  this.assignmentService
+    .getAssignments(this.data.incidentId)
+    .subscribe({
+      next: (res: any) => {
+        this.assignedEngineers =
+          res?.data?.assignments || [];
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+}
 
 }
