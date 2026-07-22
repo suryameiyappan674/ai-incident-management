@@ -1,4 +1,4 @@
-import { 
+import {
   Component,
   Inject,
   inject
@@ -12,8 +12,8 @@ import {
   MatDialogRef
 } from '@angular/material/dialog';
 
-import { 
-  MatButtonModule 
+import {
+  MatButtonModule
 } from '@angular/material/button';
 
 import {
@@ -24,25 +24,25 @@ import {
   MatTooltipModule
 } from '@angular/material/tooltip';
 
-import { 
-  Incident as IncidentService 
+import {
+  Incident as IncidentService
 } from '../../../services/incident';
 
 
 
 interface Incident {
 
-  incidentId:string;
+  incidentId: string;
 
-  title:string;
+  title: string;
 
-  priority:string;
+  priority: string;
 
-  description:string;
+  description: string;
 
-  status:string;
+  status: string;
 
-  createdAt:string;
+  createdAt: string;
 
 }
 
@@ -50,21 +50,21 @@ interface Incident {
 
 @Component({
 
- selector:'app-incident-details-dialog',
+  selector: 'app-incident-details-dialog',
 
- standalone:true,
+  standalone: true,
 
- imports:[
-  CommonModule,
-  MatDialogModule,
-  MatButtonModule,
-  MatIconModule,
-  MatTooltipModule
- ],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule
+  ],
 
- templateUrl:'./incident-details-dialog.html',
+  templateUrl: './incident-details-dialog.html',
 
- styleUrl:'./incident-details-dialog.css'
+  styleUrl: './incident-details-dialog.css'
 
 })
 
@@ -72,95 +72,95 @@ interface Incident {
 export class IncidentDetailsDialog {
 
 
-similarIncidents:Incident[]=[];
+  similarIncidents: Incident[] = [];
 
-aiGenerated=false;
+  aiGenerated = false;
 
-aiContent='';
-
-
-
-private incidentService = inject(IncidentService);
-
-
-private dialogRef = inject(
-  MatDialogRef<IncidentDetailsDialog>
-);
+  aiContent = '';
 
 
 
-constructor(
+  private incidentService = inject(IncidentService);
 
- @Inject(MAT_DIALOG_DATA)
- public data:Incident
 
-){
-
- this.findSimilarIncidents();
-
-}
+  private dialogRef = inject(
+    MatDialogRef<IncidentDetailsDialog>
+  );
 
 
 
+  constructor(
 
-findSimilarIncidents(){
+    @Inject(MAT_DIALOG_DATA)
+    public data: Incident
 
+  ) {
 
-const previousIncidents:Incident[]=[
+    this.findSimilarIncidents();
 
-{
- incidentId:'INC-003',
- title:'API Down',
- priority:'Critical',
- description:'Payment API issue',
- status:'Resolved',
- createdAt:'10-Jul-2026'
-},
-
-
-{
- incidentId:'INC-004',
- title:'Database Timeout',
- priority:'High',
- description:'Database slow response',
- status:'Resolved',
- createdAt:'12-Jul-2026'
-}
-
-];
-
-
-
-this.similarIncidents =
-previousIncidents.filter(
-incident=>
-
-incident.status==='Resolved'
-
-&&
-
-incident.title
-.toLowerCase()
-.includes(
- this.data.title.toLowerCase()
-)
-
-);
-
-
-}
+  }
 
 
 
 
-
-generateAIAnalysis(){
-
-
-this.aiGenerated=true;
+  findSimilarIncidents() {
 
 
-this.aiContent=`
+    const previousIncidents: Incident[] = [
+
+      {
+        incidentId: 'INC-003',
+        title: 'API Down',
+        priority: 'Critical',
+        description: 'Payment API issue',
+        status: 'Resolved',
+        createdAt: '10-Jul-2026'
+      },
+
+
+      {
+        incidentId: 'INC-004',
+        title: 'Database Timeout',
+        priority: 'High',
+        description: 'Database slow response',
+        status: 'Resolved',
+        createdAt: '12-Jul-2026'
+      }
+
+    ];
+
+
+
+    this.similarIncidents =
+      previousIncidents.filter(
+        incident =>
+
+          incident.status === 'Resolved'
+
+          &&
+
+          incident.title
+            .toLowerCase()
+            .includes(
+              this.data.title.toLowerCase()
+            )
+
+      );
+
+
+  }
+
+
+
+
+
+  generateAIAnalysis() {
+
+
+    this.aiGenerated = true;
+
+
+    this.aiContent = `
 
 Incident Summary:
 
@@ -181,66 +181,56 @@ Investigate root cause and apply fix.
 
 `;
 
-}
+  }
 
 
 
 
 
-copyIncidentId(id:string){
+  copyIncidentId(id: string) {
 
- navigator.clipboard.writeText(id);
+    navigator.clipboard.writeText(id);
 
-}
-
-
+  }
 
 
 
-changeStatus(status:string){
 
 
-this.incidentService
-.updateIncidentStatus(
- this.data.incidentId,
- status
-)
+  changeStatus(status: string) {
 
-.subscribe({
+    this.incidentService
+      .updateIncidentStatus(
+        this.data.incidentId,
+        status
+      )
 
-next:(res)=>{
+      .subscribe({
 
+        next: (res) => {
+          this.data.status = status;
+          this.dialogRef.close({
+            updated: true
+          });
 
-this.data.status=status;
-
-
-alert(
- "Incident status updated successfully"
-);
-
-
-},
+        },
 
 
-error:(err)=>{
+        error: (err) => {
+          console.error(err);
+          alert(
+            err.error?.message ||
+            "Status update failed"
+          );
 
 
-console.error(err);
+        }
 
 
-alert(
- err.error?.message ||
- "Status update failed"
-);
+      });
 
 
-}
-
-
-});
-
-
-}
+  }
 
 
 

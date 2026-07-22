@@ -118,7 +118,7 @@ export class Engineer implements OnInit {
 
   // ✅ Open dialog
   openIncident(row: Incident): void {
-    this.dialog.open(IncidentDetailsDialog, {
+   const dialogRef= this.dialog.open(IncidentDetailsDialog, {
       width: '900px',
       maxWidth: '95vw',
       maxHeight: '95vh',
@@ -126,6 +126,13 @@ export class Engineer implements OnInit {
       disableClose: true,
       panelClass: 'incident-dialog'
     });
+      dialogRef.afterClosed().subscribe(result => {
+
+    if (result?.updated) {
+      this.loadIncidents();   // Refresh table automatically
+    }
+
+  });
   }
 
   // ✅ Search
