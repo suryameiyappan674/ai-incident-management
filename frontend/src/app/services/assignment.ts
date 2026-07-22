@@ -19,7 +19,6 @@ export class Assignment {
     assignEngineer(
         incidentId: string,
         assigneeId: string,
-        note: string
     ) {
 
         return this.http.post(
@@ -28,7 +27,6 @@ export class Assignment {
 
             {
                 assigneeId,
-                note
             }
 
         );

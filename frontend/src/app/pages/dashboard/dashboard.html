@@ -1,5 +1,6 @@
 <div class="dashboard-container">
 
+  <!-- HEADER -->
   <div class="header">
     <div>
       <h2>Incident Intelligence Dashboard</h2>
@@ -16,9 +17,7 @@
         (click)="openCreateIncident()">
 
         <mat-icon>add</mat-icon>
-
         Create Incident
-
       </button>
 
       <button mat-button color="warn" (click)="logout()">
@@ -28,7 +27,7 @@
     </div>
   </div>
 
-  <!-- Stats Cards -->
+  <!-- STATS -->
   <div class="cards">
     <mat-card class="card total">
       <h3>Total</h3>
@@ -51,18 +50,17 @@
     </mat-card>
   </div>
 
-  <!-- Loading Indicator -->
-  @if (isLoading) {
-  <div class="spinner-container">
+  <!-- ✅ LOADER FIX -->
+  <div *ngIf="isLoading" class="spinner-container">
     <mat-spinner diameter="40"></mat-spinner>
   </div>
-  }
 
-  <!-- Data Table -->
+  <!-- TABLE -->
   <mat-card class="table-card">
-    <table mat-table [dataSource]="incidents" class="full-width-table">
 
-      <!-- ID Column -->
+    <table mat-table [dataSource]="incidents || []" class="full-width-table">
+
+      <!-- ID -->
       <ng-container matColumnDef="incidentId">
         <th mat-header-cell *matHeaderCellDef>ID</th>
         <td mat-cell *matCellDef="let row">
@@ -70,21 +68,24 @@
         </td>
       </ng-container>
 
-      <!-- Title Column -->
+      <!-- TITLE -->
       <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef>Title</th>
         <td mat-cell *matCellDef="let row">
           <div class="title-cell">
             <span class="title-text">{{row.title}}</span>
-            @if (row.description) {
-            <small class="description-preview">{{row.description | slice:0:60}}{{row.description.length > 60 ? '...' :
-              ''}}</small>
-            }
+
+            <!-- ✅ FIX -->
+            <small *ngIf="row.description" class="description-preview">
+              {{row.description | slice:0:60}}
+              {{row.description.length > 60 ? '...' : ''}}
+            </small>
+
           </div>
         </td>
       </ng-container>
 
-      <!-- Priority Column -->
+      <!-- PRIORITY -->
       <ng-container matColumnDef="priority">
         <th mat-header-cell *matHeaderCellDef>Priority</th>
         <td mat-cell *matCellDef="let row">
@@ -94,7 +95,7 @@
         </td>
       </ng-container>
 
-      <!-- Status Column -->
+      <!-- STATUS -->
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let row">
@@ -104,7 +105,7 @@
         </td>
       </ng-container>
 
-      <!-- Raised By Column -->
+      <!-- CREATED BY -->
       <ng-container matColumnDef="createdBy">
         <th mat-header-cell *matHeaderCellDef>Raised By</th>
         <td mat-cell *matCellDef="let row">
@@ -112,21 +113,27 @@
         </td>
       </ng-container>
 
-
-      <!-- Assign Column -->
+      <!-- ASSIGN -->
       <ng-container matColumnDef="assign">
-        <th mat-header-cell *matHeaderCellDef>
-          Assign
-        </th>
+        <th mat-header-cell *matHeaderCellDef>Assign</th>
+
         <td mat-cell *matCellDef="let row">
-          <button *ngIf="currentUser?.role?.name==='admin'" mat-raised-button color="primary"
-            (click)="openAssignDialog(row)">
-            Assign
+
+          <button *ngIf="currentUser?.role?.name==='admin'" mat-raised-button
+            [ngClass]="isAssigned(row) ? 'assigned-btn' : 'pending-btn'" (click)="openAssignDialog(row)">
+
+            <mat-icon>
+              {{ isAssigned(row) ? 'check_circle' : 'person_add' }}
+            </mat-icon>
+
+            {{ isAssigned(row) ? 'Assigned' : 'Yet to Assign' }}
+
           </button>
+
         </td>
       </ng-container>
 
-      <!-- Created At Column -->
+      <!-- CREATED AT -->
       <ng-container matColumnDef="createdAt">
         <th mat-header-cell *matHeaderCellDef>Created At</th>
         <td mat-cell *matCellDef="let row">
@@ -134,10 +141,13 @@
         </td>
       </ng-container>
 
+      <!-- ROWS -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+
+      <!-- ✅ TRACKBY FIX -->
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-      <!-- Row shown when there is no data -->
+      <!-- EMPTY -->
       <tr class="mat-row" *matNoDataRow>
         <td class="mat-cell empty-table" [attr.colspan]="displayedColumns.length">
           No incidents found.
@@ -146,9 +156,9 @@
 
     </table>
 
-    <!-- Pagination -->
+    <!-- PAGINATION -->
     <mat-paginator [length]="totalRecords" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
-      [pageIndex]="currentPage" (page)="onPageChange($event)" aria-label="Select page of incidents">
+      [pageIndex]="currentPage" (page)="onPageChange($event)">
     </mat-paginator>
 
   </mat-card>

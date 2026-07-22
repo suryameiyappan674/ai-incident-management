@@ -11,7 +11,7 @@ import {
     MatDialogModule,
     MatDialogRef
 } from '@angular/material/dialog';
-
+import { ChangeDetectorRef } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,6 +20,7 @@ import { SelectModule } from 'primeng/select';
 
 import { User } from '../../../services/user';
 import { Engineer } from '../../../models/engineer';
+import { Assignment } from '../../../services/assignment';
 
 @Component({
     selector: 'app-assign-incident-dialog',
@@ -31,7 +32,7 @@ import { Engineer } from '../../../models/engineer';
         MatButtonModule,
         MatFormFieldModule,
         MatInputModule,
-        SelectModule
+        SelectModule,
     ],
     templateUrl: './assign-incident-dialog.html',
     styleUrl: './assign-incident-dialog.css'
@@ -40,6 +41,8 @@ export class AssignIncidentDialog implements OnInit {
 
     private fb = inject(FormBuilder);
     private userService = inject(User);
+    private cdr = inject(ChangeDetectorRef);
+    private assignmentService = inject(Assignment);
 
     dialogRef = inject(MatDialogRef<AssignIncidentDialog>);
     data = inject(MAT_DIALOG_DATA);
@@ -47,14 +50,14 @@ export class AssignIncidentDialog implements OnInit {
     engineers: Engineer[] = [];
 
     loading = false;
-
+assignedEngineers: any[] = [];
     form = this.fb.group({
         engineer: this.fb.control<Engineer | null>(null, Validators.required),
-        note: this.fb.control('')
     });
 
     ngOnInit(): void {
         this.loadEngineers();
+         this.loadAssignedEngineers();
     }
 
     loadEngineers() {
@@ -68,13 +71,14 @@ export class AssignIncidentDialog implements OnInit {
                 this.loading = false;
 
                 this.engineers = res.data;
+                 this.cdr.detectChanges();
 
             },
 
             error: () => {
 
                 this.loading = false;
-
+                this.cdr.detectChanges();
             }
 
         });
@@ -95,10 +99,21 @@ export class AssignIncidentDialog implements OnInit {
 
             engineer: this.form.value.engineer,
 
-            note: this.form.value.note
-
         });
 
     }
+ loadAssignedEngineers() {
+  this.assignmentService
+    .getAssignments(this.data.incidentId)
+    .subscribe({
+      next: (res: any) => {
+        this.assignedEngineers =
+          res?.data?.assignments || [];
+      },
+      error: (err) => {
+        console.error(err);
+      }
+    });
+}
 
 }

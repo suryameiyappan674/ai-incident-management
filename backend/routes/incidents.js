@@ -72,30 +72,121 @@ router.get('/', authenticateJWT, async (req, res, next) => {
     if (priority) filter.priority = priority;
     if (status) filter.status = status;
 
-    // Role-based filtering: admins see all incidents; non-admins see only assigned incidents
-    if (req.user.role && req.user.role.name !== 'admin') {
+    // Role-based filtering: admins see all incidents; non-admins see only assigned incidents OR incidents they created
+    if (req.user.role && req.user.role.name == 'engineer') {
       const assignments = await IncidentAssignment.find({ assignee: req.user._id }).select('incident');
       const incidentIds = assignments.map(a => a.incident);
-      filter._id = { $in: incidentIds };
+
+      // They can see incidents assigned to them OR incidents they created
+      filter.$or = [
+        { _id: { $in: incidentIds } },
+        { createdBy: req.user._id }
+      ];
+    } else if (req.user.role && req.user.role.name == 'user') {
+      filter.$or = [
+        { createdBy: req.user._id }
+      ];
     }
 
     const skip = (Number(page) - 1) * Number(limit);
 
-    const [incidents, total, openCount, progressCount, resolvedCount, closedCount] = await Promise.all([
+    const [rawIncidents, total, openCount, progressCount, resolvedCount, closedCount] = await Promise.all([
       Incident.find(filter)
         .populate('createdBy', 'username email')
         .sort({ createdAt: -1 })
         .skip(skip)
-        .limit(Number(limit)),
+        .limit(Number(limit))
+        .lean(),
       Incident.countDocuments(filter),
-      Incident.countDocuments({ ...filter, status: 'Open' }),
+      Incident.countDocuments({ ...filter, status: 'Pending' }),
       Incident.countDocuments({ ...filter, status: 'In Progress' }),
       Incident.countDocuments({ ...filter, status: 'Resolved' }),
       Incident.countDocuments({ ...filter, status: 'Closed' })
     ]);
 
+    // Fetch assignment data for these incidents
+    const incidentIdsList = rawIncidents.map(inc => inc._id);
+    const assignments = await IncidentAssignment.find({ incident: { $in: incidentIdsList }, status: 'Active' })
+      .populate('assignee', 'username email')
+      .lean();
+
+    const incidents = rawIncidents.map(inc => {
+      const incAssignments = assignments.filter(a => a.incident.toString() === inc._id.toString());
+      return {
+        ...inc,
+        assignees: incAssignments.map(a => a.assignee)
+      };
+    });
+
     return res.json({
       message: 'Incidents fetched successfully',
+      statusCode: 200,
+      data: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        incidents,
+        stats: {
+          total,
+          pending: openCount,
+          inProgress: progressCount,
+          resolved: resolvedCount + closedCount
+        }
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/*  GET /api/v1/incidents/my-assignments — List incidents assigned to me */
+/* ------------------------------------------------------------------ */
+router.get('/my-assignments', authenticateJWT, async (req, res, next) => {
+  try {
+    const { priority, status, page = 1, limit = 20 } = req.query;
+
+    const filter = {};
+    if (priority) filter.priority = priority;
+    if (status) filter.status = status;
+
+    // Find all assignments for the currently logged-in user
+    const assignments = await IncidentAssignment.find({ assignee: req.user._id }).select('incident');
+    const incidentIds = assignments.map(a => a.incident);
+    filter._id = { $in: incidentIds };
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const [rawIncidents, total, openCount, progressCount, resolvedCount, closedCount] = await Promise.all([
+      Incident.find(filter)
+        .populate('createdBy', 'username email')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit))
+        .lean(),
+      Incident.countDocuments(filter),
+      Incident.countDocuments({ ...filter, status: 'Pending' }),
+      Incident.countDocuments({ ...filter, status: 'In Progress' }),
+      Incident.countDocuments({ ...filter, status: 'Resolved' }),
+      Incident.countDocuments({ ...filter, status: 'Closed' })
+    ]);
+
+    // Fetch assignment data for these incidents
+    const incidentIdsList = rawIncidents.map(inc => inc._id);
+    const assignmentData = await IncidentAssignment.find({ incident: { $in: incidentIdsList }, status: 'Active' })
+      .populate('assignee', 'username email')
+      .lean();
+
+    const incidents = rawIncidents.map(inc => {
+      const incAssignments = assignmentData.filter(a => a.incident.toString() === inc._id.toString());
+      return {
+        ...inc,
+        assignees: incAssignments.map(a => a.assignee)
+      };
+    });
+
+    return res.json({
+      message: 'Assigned incidents fetched successfully',
       statusCode: 200,
       data: {
         total,
@@ -260,5 +351,48 @@ router.delete('/:id/assignments/:assignmentId', authenticateJWT, authorizeRoles(
     next(error);
   }
 });
+router.patch('/:id/status',
+  authenticateJWT,
+  async (req, res, next) => {
+
+    try {
+
+      const { status } = req.body;
+
+
+      const incident = await findIncident(req.params.id);
+
+
+      if (!incident) {
+
+        return res.status(404).json({
+          message: "Incident not found"
+        });
+
+      }
+
+
+      incident.status = status;
+
+      await incident.save();
+
+
+      res.json({
+
+        message: "Status updated successfully",
+        statusCode: 200,
+        data: incident
+
+      });
+
+
+    }
+    catch (error) {
+
+      next(error);
+
+    }
+
+  });
 
 module.exports = router;

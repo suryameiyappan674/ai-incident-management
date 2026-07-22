@@ -3,7 +3,7 @@
 <form [formGroup]="form">
 
     <div mat-dialog-content>
-
+ <strong>{{ data.incidentId }}</strong>
         <p-select
             formControlName="engineer"
             [options]="engineers"
@@ -12,11 +12,13 @@
             filterBy="username,email"
             [showClear]="true"
             placeholder="Select Engineer"
-            appendTo="body"
+            appendTo="self"
             styleClass="w-full" 
-      
+       scrollHeight="130px"
     [overlayOptions]="{
-        baseZIndex: 12000
+        mode: 'overlay',
+        autoZIndex: true,
+        baseZIndex: 100000
     }">
 
             <!-- Selected Engineer -->
@@ -75,30 +77,27 @@
             </ng-template>
 
         </p-select>
+        
+<div class="assigned-card" *ngFor="let item of assignedEngineers">
+  <strong>{{ item.assignee.username }}</strong><br>
+  {{ item.assignee.email }}<br>
+  <small>Assigned by {{ item.assignedBy?.username }}</small>
+</div>
 
         <!-- Selected Engineer Details -->
 
         <div class="selected-engineer" *ngIf="selectedEngineer">
 
             <h4>Selected Engineer</h4>
-
             <p>
-
                 <strong>{{ selectedEngineer.username }}</strong>
-
             </p>
-
             <p>
-
                 {{ selectedEngineer.email }}
-
             </p>
-
             <p>
-
-                Active Incidents:
+               Active Incidents:
                 {{ selectedEngineer.activeIncidents }}
-
             </p>
 
         </div>

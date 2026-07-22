@@ -45,12 +45,34 @@
 }
 
 .selected-engineer {
-    margin-top: 20px;
-    padding: 16px;
+    margin-top: 10px;
+    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 8px;
     background: #fafafa;
 }
+
 :host ::ng-deep .p-select-overlay {
-    z-index: 100000 !important;
+    position: fixed !important;
+    z-index: 999999 !important;
+}
+
+:host ::ng-deep .p-overlay {
+    z-index: 999999 !important;
+}
+:host ::ng-deep .mat-mdc-dialog-content {
+    min-height: 200px;
+    max-height: 500px;
+    overflow: visible !important;
+}
+:host ::ng-deep .mat-mdc-dialog-surface,
+:host ::ng-deep .mdc-dialog__surface {
+    overflow: visible !important;
+}
+.assigned-card {
+  padding: 12px;
+  margin-top: 10px;
+  border-left: 4px solid #4caf50;
+  background: #fafafa;
+  border-radius: 8px;
 }

@@ -14,14 +14,38 @@ body {
     background: #f5f5f5;
 }
 
-.cdk-overlay-container {
-    z-index: 1000;
+.p-overlay {
+    z-index: 999999 !important;
+}
+
+.p-overlay-content {
+    z-index: 999999 !important;
 }
 
 .p-select-overlay {
-    z-index: 12000 !important;
+    z-index: 999999 !important;
+}
+/* Material dialog container */
+.cdk-overlay-container {
+    z-index: 99999 !important;
+}
+.mat-mdc-dialog-container,
+.mdc-dialog__surface,
+.mat-mdc-dialog-content {
+    overflow: visible !important;
 }
 
-.p-component-overlay {
-    z-index: 12000 !important;
+
+.incident-dialog .mat-mdc-dialog-container {
+  padding: 0 !important;
+}
+
+.incident-dialog .mat-mdc-dialog-surface {
+  overflow: hidden !important;
+}
+
+.incident-dialog .mat-mdc-dialog-content {
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  padding: 20px !important;
 }
