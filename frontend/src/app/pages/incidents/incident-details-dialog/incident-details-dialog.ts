@@ -167,6 +167,7 @@ export class IncidentDetailsDialog implements OnInit, OnDestroy {
     // Client-side publish to Centrifugo channel
     this.chatSubscription.publish(data).then(() => {
       this.chatMessage = '';
+       this.cdr.detectChanges();
     }).catch((err: any) => {
       console.error('Publish error', err);
       // Fallback: If Centrifugo doesn't allow client-side publishing, just push it locally 
